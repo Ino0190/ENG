@@ -206,6 +206,8 @@ p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
     <textarea id="jOut" class="jta" readonly placeholder="下のボタンで じゅもん を出す"></textarea>
     <button class="promptBtn" onclick="copyJumonLink()">🔗 復元リンクをコピーする（おすすめ）</button>
     <div class="promptHint"><b>これが一番確実。</b>リンクを自分宛てに送って、スマホでそのリンクを開くだけで戻る。貼り付ける操作が要らないので、改行が混ざって失敗することがない。</div>
+    <div class="promptHint">送られるリンクの宛先：<br><b id="jLinkBase" style="word-break:break-all;color:var(--blue)"></b><br>
+      ここが実際に開けるURLになっているか確かめる。違っていたら <code>ver.js</code> の <code>PAGES_BASE</code> を直す。</div>
     <button class="promptBtn" onclick="copyJumon()">📜 じゅもんの文字列をコピーする</button>
     <div class="promptHint">リンクが使えないときはこちら。スマホでこのページを開いて、下の②に貼り付ける。</div>
   </div>
@@ -439,9 +441,7 @@ const JUMON_PREFIX="ENGv2:";
 const JUMON_OLD="ENGv1:";
 // 終端記号。メールの署名や「以上」などが後ろに付いてもここで切れる（: は base64 に出てこない）
 const JUMON_END=":END";
-// 版は ver.js の APP_VER が正本（全ページ共通）
-// file:// で開いているときは自分のURLが使えないので、公開URLを使ってリンクを作る
-const PAGES_URL="https://ino0190.github.io/ENG_Drill/saigakushu.html";
+// 版と公開URLは ver.js が正本（全ページ共通）。ここには焼き込まない
 const KANRYO_KEY="kanryo_v1";
 const DIAG_KEY="engdrill_v1";      // 診断（index.html）
 const TANGO_NEED="tango_need_v1";  // 単語の定着待ち
@@ -493,6 +493,7 @@ function openJumon(){
   document.getElementById("jVer").textContent=
     "このページの版: "+(typeof APP_VER!=="undefined"?APP_VER:"不明（ver.jsが読めていない）")
     +" ／ 開き方: "+(location.protocol==="file:"?"ファイルを直接":location.host);
+  document.getElementById("jLinkBase").textContent=jumonLink().split("#")[0];
   show("scr-jumon");
 }
 function copyJumon(){
@@ -503,14 +504,23 @@ function toUrlSafe(b64){return b64.replace(/\+/g,"-").replace(/\//g,"_").replace
 function jumonLink(){
   const full=packJumon();
   const b64=full.slice(JUMON_PREFIX.length,full.length-JUMON_END.length);
-  // file:// のときは自分のURLを渡しても相手が開けないので、公開URLに載せる
-  const base=(location.protocol==="http:"||location.protocol==="https:")
-    ? location.origin+location.pathname : PAGES_URL;
+  // file:// のときは自分のURLを渡しても相手が開けないので、ver.js の公開URLに載せる
+  let base;
+  if(location.protocol==="http:"||location.protocol==="https:"){
+    base=location.origin+location.pathname;
+  }else{
+    const root=(typeof PAGES_BASE!=="undefined")?PAGES_BASE:"";
+    base=root.replace(/\/?$/,"/")+"saigakushu.html";
+  }
   return base+"#j="+toUrlSafe(b64)+JUMON_END;
 }
 function copyJumonLink(){
   const url=jumonLink();
-  const note=location.protocol==="file:"?"（公開URLあてのリンクにしました）":"";
+  if(url.indexOf("http")!==0){
+    showToast("公開URLが設定されていません。ver.js の PAGES_BASE を書いてください");
+    return;
+  }
+  const note=location.protocol==="file:"?"（公開URLあて）":"";
   copyText(url,"🔗 リンクをコピーした"+note+"。スマホで開くだけで戻る");
 }
 
