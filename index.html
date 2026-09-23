@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>英文法診断ドリル — どこから崩れてる？</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0f1420; --card:#1a2233; --card2:#222d44;
+  --line:#2e3a52; --text:#e8edf5; --sub:#9fb0c8;
+  --accent:#5aa7ff; --ok:#2ecc71; --mid:#f1c40f; --ng:#e74c3c;
+}
+html,body{background:var(--bg);color:var(--text);font-family:-apple-system,'Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,sans-serif;font-size:17px;line-height:1.7;-webkit-text-size-adjust:100%}
+body{padding:0 0 60px;max-width:680px;margin:0 auto;min-height:100vh}
+
+header{position:sticky;top:0;z-index:10;background:rgba(15,20,32,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 16px}
+.hnav{display:flex;gap:8px;margin-top:10px;overflow-x:auto}
+.hnav a{flex:0 0 auto;color:var(--sub);font-size:14px;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px}
+.htop{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.htitle{font-size:16px;font-weight:700;color:var(--accent)}
+.hstat{font-size:14px;color:var(--sub)}
+.bar{height:6px;background:var(--card);border-radius:3px;margin-top:10px;overflow:hidden}
+.bar > i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+
+.screen{display:none;padding:18px 16px}
+.screen.on{display:block}
+
+/* ホーム */
+.home h1{font-size:24px;line-height:1.4;margin-bottom:6px}
+.home p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
+.modecard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px;cursor:pointer;transition:.15s}
+.modecard:active{transform:scale(.98)}
+.modecard h3{font-size:18px;margin-bottom:4px}
+.modecard p{font-size:14px;color:var(--sub)}
+.modecard.dim{opacity:.45;cursor:default}
+.breakbn{background:rgba(231,76,60,.12);border:1px solid var(--ng);border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:15px;line-height:1.7}
+.breakbn b{color:var(--ng)}
+.breakbn.okbn{background:rgba(46,204,113,.1);border-color:var(--ok)}
+.breakbn.okbn b{color:var(--ok)}
+.breakbn.midbn{background:rgba(241,196,15,.1);border-color:var(--mid)}
+.breakbn.midbn b{color:var(--mid)}
+.mapsec{margin-top:26px}
+.mapsec h2{font-size:19px;margin-bottom:4px}
+.mapsec p.mhint{font-size:14px;color:var(--sub);margin-bottom:14px}
+.grade{margin-bottom:22px}
+.grade h3{font-size:16px;color:var(--sub);margin-bottom:8px;font-weight:700}
+.units{display:flex;flex-direction:column;gap:8px}
+.uchip{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;transition:.15s}
+.uchip:active{transform:scale(.98)}
+.uchip .un{flex:1}
+.uchip .ud{font-size:13px;color:var(--sub);display:block}
+.uchip .us{font-size:14px;font-weight:700;flex:none}
+.uchip.st-ok{border-color:var(--ok)}
+.uchip.st-ok .us{color:var(--ok)}
+.uchip.st-mid{border-color:var(--mid)}
+.uchip.st-mid .us{color:var(--mid)}
+.uchip.st-ng{border-color:var(--ng);background:rgba(231,76,60,.08)}
+.uchip.st-ng .us{color:var(--ng)}
+.uchip.st-none .us{color:var(--sub)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--sub);margin-bottom:12px}
+
+/* 問題 */
+.qmeta{display:flex;justify-content:space-between;font-size:13px;color:var(--sub);margin-bottom:10px}
+.qcat{color:var(--accent);font-weight:700}
+.qbody{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+.qbody .jp{font-size:16px;color:var(--sub);margin-bottom:12px}
+.qbody .en{font-size:21px;line-height:1.6;font-weight:700}
+.qbody .en .blank{color:var(--accent);border-bottom:2px solid var(--accent);padding:0 2px}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:14px 16px;font-size:17px;cursor:pointer;display:flex;gap:10px;align-items:flex-start;transition:.12s}
+.opt:active{transform:scale(.99)}
+.opt .lab{flex:0 0 24px;height:24px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--sub)}
+.opt .ot{flex:1}
+.opt.correct{border-color:var(--ok);background:rgba(46,204,113,.12)}
+.opt.correct .lab{background:var(--ok);color:#fff}
+.opt.wrong{border-color:var(--ng);background:rgba(231,76,60,.12)}
+.opt.wrong .lab{background:var(--ng);color:#fff}
+.opt.disabled{cursor:default}
+
+/* 解説 */
+.exp{display:none;margin-top:16px;background:var(--card2);border-radius:12px;padding:16px;font-size:15px;line-height:1.8}
+.exp.on{display:block}
+.exp .verdict{font-size:17px;font-weight:700;margin-bottom:8px}
+.exp .verdict.ok{color:var(--ok)}
+.exp .verdict.ng{color:var(--ng)}
+.exp .full{background:rgba(46,204,113,.12);border:1px solid var(--ok);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:16px;font-weight:700}
+.exp .h{color:var(--accent);font-weight:700;margin:10px 0 4px}
+.exp .elim{font-size:14px;color:var(--sub)}
+.exp .bunpolink{display:inline-block;margin-top:12px;color:var(--accent);font-size:15px;text-decoration:none;border:1px solid var(--accent);border-radius:10px;padding:8px 14px}
+.nextbtn{margin-top:16px;width:100%;background:var(--accent);border:none;color:#0f1420;border-radius:12px;padding:15px;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit;display:none}
+.nextbtn.on{display:block}
+.homebtn{background:none;border:1px solid var(--line);color:var(--sub);border-radius:10px;padding:8px 14px;font-size:14px;cursor:pointer;font-family:inherit;margin-bottom:14px}
+/* 結果 */
+.result{text-align:center;padding:30px 0}
+.result .big{font-size:40px;font-weight:700;margin-bottom:8px}
+.result p{color:var(--sub);font-size:16px;margin-bottom:20px}
+.result .rbtn{display:block;width:100%;background:var(--card);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px}
+.result .rbtn.main{background:var(--accent);border-color:var(--accent);color:#0f1420}
+
+/* トースト */
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--card2);border:1px solid var(--accent);color:var(--text);border-radius:10px;padding:12px 18px;font-size:15px;max-width:90%;opacity:0;pointer-events:none;transition:opacity .25s;z-index:50}
+#toast.on{opacity:1}
+</style>
+</head>
+<body>
+<header>
+  <div class="htop">
+    <div class="htitle">英文法診断ドリル</div>
+    <div class="hstat" id="hstat"></div>
+  </div>
+  <div class="bar"><i id="hbar"></i></div>
+  <nav class="hnav"><a href="kanryo.html">⏳ 完了形</a><a href="saigakushu.html">🧱 再学習</a><a href="bunpo.html">📖 解説</a><a href="tango.html">🎴 単語</a></nav>
+</header>
+
+<div class="screen home on" id="scr-home">
+  <h1>どこから崩れてる？</h1>
+  <p class="lead">中1→高校の順で文法を診断して、分からなくなり始めた単元を特定する。</p>
+  <div id="breakpoint"></div>
+  <div class="modecard" onclick="startDiag(false)" id="mc-diag">
+    <h3>▶ 診断を進める</h3>
+    <p id="diagdesc">中1から順に1問ずつ。途中でやめても続きから再開できる。</p>
+  </div>
+  <div class="modecard" onclick="startWrong()" id="mc-wrong">
+    <h3>🔥 間違えたやつだけ</h3>
+    <p id="wrongdesc"></p>
+  </div>
+  <div class="modecard" onclick="copyDiagPrompt()" id="mc-ai">
+    <h3>🤖 診断結果をAIに相談（コピー）</h3>
+    <p id="aidesc">単元別の結果と間違え方をまとめたプロンプトをコピー。KiroやClaudeに貼ると「何が分かってないか」を解説してもらえる。</p>
+  </div>
+  <div class="modecard" onclick="location.href='bunpo.html'">
+    <h3>📖 用語なし解説</h3>
+    <p>不定詞・分詞構文などの用語を使わずに全24単元を説明。用語は「翻訳表」で対応。</p>
+  </div>
+  <div class="modecard" onclick="location.href='tango.html'">
+    <h3>🎴 英単語 どっち</h3>
+    <p>中1→高校のレベル別サンプルで、単語も「どの帯から崩れてるか」を診断。間違えた単語は3回連続正解するまで出てくる。</p>
+  </div>
+  <div class="mapsec">
+    <h2>文法マップ</h2>
+    <p class="mhint">単元をタップするとその3問だけ解ける（解き直しで色も更新）</p>
+    <div class="legend"><span>◎ 3/3=分かってる</span><span>△ 2/3=怪しい</span><span>✕ 0〜1=崩れてる</span></div>
+    <div id="map"></div>
+  </div>
+  <div class="modecard" onclick="resetAll()" style="margin-top:20px">
+    <h3>🗑 記録をリセット</h3>
+    <p>診断をまっさらからやり直す</p>
+  </div>
+</div>
+
+<div class="screen" id="scr-quiz">
+  <button class="homebtn" onclick="goHome()">← マップに戻る</button>
+  <div class="qmeta"><span class="qcat" id="qcat"></span><span id="qnum"></span></div>
+  <div class="qbody"><div class="jp" id="qjp"></div><div class="en" id="qen"></div></div>
+  <div class="opts" id="qopts"></div>
+  <div class="exp" id="qexp"></div>
+  <button class="nextbtn" id="nextbtn" onclick="nextQ()">次へ</button>
+</div>
+
+<div class="screen" id="scr-result">
+  <div class="result">
+    <div class="big" id="rscore"></div>
+    <p id="rmsg"></p>
+    <button class="rbtn main" onclick="goHome()">マップを見る</button>
+    <button class="rbtn" id="rretry" onclick="retryRun()">この範囲をもう一度</button>
+    <button class="rbtn" onclick="copyDiagPrompt()">🤖 診断結果をAIに相談（コピー）</button>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script src="questions.js"></script>
+<script>
+const KEY="engdrill_v1";
+let state=load()||{ans:{}};
+let queue=[],qi=0,mode=null,curUnit=null,runCorrect=0,lastRun=null;
+const byId={};QUESTIONS.forEach(q=>byId[q.id]=q);
+const unitQs={};UNITS.forEach(u=>unitQs[u.id]=QUESTIONS.filter(q=>q.u===u.id));
+
+function load(){try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return null}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+
+function unitStatus(uid){
+  const qs=unitQs[uid],done=qs.filter(q=>q.id in state.ans);
+  if(done.length===0)return{st:"none",label:"—"};
+  const c=done.filter(q=>state.ans[q.id].ok).length;
+  if(done.length<qs.length)return{st:"none",label:done.length+"/"+qs.length+"問"};
+  if(c===3)return{st:"ok",label:"◎"};
+  if(c===2)return{st:"mid",label:"△ 2/3"};
+  return{st:"ng",label:"✕ "+c+"/3"};
+}
+function firstBreak(){
+  let firstNg=null,firstMid=null,anyDone=false,allOk=true;
+  for(const u of UNITS){
+    const s=unitStatus(u.id);
+    if(s.st!=="none")anyDone=true;
+    if(s.st!=="ok")allOk=false;
+    if(s.st==="ng"&&!firstNg)firstNg=u;
+    if(s.st==="mid"&&!firstMid)firstMid=u;
+  }
+  return{firstNg,firstMid,anyDone,allOk};
+}
+function renderHome(){
+  const answered=Object.keys(state.ans).length,total=QUESTIONS.length;
+  document.getElementById("hstat").textContent="診断 "+answered+"/"+total;
+  document.getElementById("hbar").style.width=(answered/total*100)+"%";
+  // 崩れの起点バナー
+  const b=firstBreak(),bp=document.getElementById("breakpoint");
+  if(!b.anyDone){bp.innerHTML="";}
+  else if(b.firstNg){
+    bp.innerHTML='<div class="breakbn">🚧 崩れの起点: <b>'+b.firstNg.g+"「"+b.firstNg.name+'」</b><br>ここより上の学年の単元は、この土台の上に乗っている。まずここを固めるのが近道。</div>';
+  }else if(b.firstMid){
+    bp.innerHTML='<div class="breakbn midbn">⚠ ✕はないが <b>'+b.firstMid.g+"「"+b.firstMid.name+'」</b> が怪しい（2/3）。タップして解き直すと◎に更新できる。</div>';
+  }else if(b.allOk&&answered===total){
+    bp.innerHTML='<div class="breakbn okbn">🎉 <b>全単元◎</b>。中学〜高校の基礎文法は崩れていない。</div>';
+  }else{bp.innerHTML="";}
+  // 診断ボタンの文言
+  const remain=total-answered;
+  document.getElementById("diagdesc").textContent=remain===0?"全問回答済み。マップの単元タップで解き直せる。":(answered===0?"中1から順に1問ずつ。途中でやめても続きから再開できる。":"続きから（残り"+remain+"問）");
+  // 間違えたやつ
+  const wrong=QUESTIONS.filter(q=>state.ans[q.id]&&!state.ans[q.id].ok);
+  document.getElementById("wrongdesc").textContent=wrong.length?wrong.length+"問。正解すると記録が上書きされてマップも更新される。":"今はゼロ。";
+  document.getElementById("mc-wrong").classList.toggle("dim",!wrong.length);
+  document.getElementById("mc-ai").classList.toggle("dim",!answered);
+  // マップ
+  const grades=[...new Set(UNITS.map(u=>u.g))];
+  let html="";
+  for(const g of grades){
+    html+='<div class="grade"><h3>'+g+'</h3><div class="units">';
+    for(const u of UNITS.filter(x=>x.g===g)){
+      const s=unitStatus(u.id);
+      html+='<div class="uchip st-'+s.st+'" onclick="startUnit(\''+u.id+'\')"><span class="un">'+u.name+'<span class="ud">'+u.desc+'</span></span><span class="us">'+s.label+'</span></div>';
+    }
+    html+='</div></div>';
+  }
+  document.getElementById("map").innerHTML=html;
+}
+
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));document.getElementById(id).classList.add("on")}
+function goHome(){renderHome();show("scr-home")}
+
+function startRun(ids,m,uid){
+  if(!ids.length)return;
+  queue=ids;qi=0;mode=m;curUnit=uid||null;runCorrect=0;
+  lastRun={ids:[...ids],m,uid};
+  showQ();show("scr-quiz");
+}
+function startDiag(reset){
+  if(reset){state.ans={};save();}
+  const ids=QUESTIONS.filter(q=>!(q.id in state.ans)).map(q=>q.id);
+  if(!ids.length){goHome();return;}
+  startRun(ids,"diag");
+}
+function startUnit(uid){startRun(unitQs[uid].map(q=>q.id),"unit",uid)}
+function startWrong(){startRun(QUESTIONS.filter(q=>state.ans[q.id]&&!state.ans[q.id].ok).map(q=>q.id),"wrong")}
+function retryRun(){if(lastRun)startRun(lastRun.ids,lastRun.m,lastRun.uid)}
+function resetAll(){if(confirm("診断の記録を全部消す？")){state.ans={};save();goHome();}}
+
+function showQ(){
+  const q=byId[queue[qi]];
+  const u=UNITS.find(x=>x.id===q.u);
+  document.getElementById("qcat").textContent=u.g+"・"+u.name;
+  document.getElementById("qnum").textContent=(qi+1)+" / "+queue.length;
+  document.getElementById("qjp").textContent=q.jp;
+  document.getElementById("qen").innerHTML=esc(q.en).replace("___",'<span class="blank">___</span>');
+  const opts=document.getElementById("qopts");
+  const perm=[0,1,2,3];
+  for(let i=perm.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[perm[i],perm[j]]=[perm[j],perm[i]];}
+  opts.innerHTML=perm.map((oi,pos)=>'<div class="opt" data-i="'+oi+'" onclick="answer('+oi+')"><span class="lab">'+"ABCD"[pos]+'</span><span class="ot">'+esc(q.o[oi])+'</span></div>').join("");
+  document.getElementById("qexp").className="exp";
+  document.getElementById("nextbtn").className="nextbtn";
+  window.scrollTo(0,0);
+}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+let answered=false;
+function answer(i){
+  if(answered)return;answered=true;
+  const q=byId[queue[qi]],ok=i===q.a;
+  if(ok)runCorrect++;
+  state.ans[q.id]={sel:i,ok};save();
+  document.querySelectorAll(".opt").forEach(el=>{
+    el.classList.add("disabled");el.onclick=null;
+    const idx=+el.dataset.i;
+    if(idx===q.a)el.classList.add("correct");
+    else if(idx===i)el.classList.add("wrong");
+  });
+  const full=q.en.replace("___",q.o[q.a]);
+  const exp=document.getElementById("qexp");
+  exp.innerHTML='<div class="verdict '+(ok?"ok":"ng")+'">'+(ok?"⭕ 正解":"❌ 不正解")+'</div>'
+    +'<div class="full">'+esc(full)+'</div>'
+    +'<div class="h">決め手</div><div>'+esc(q.why)+'</div>'
+    +'<div class="h">他の選択肢</div><div class="elim">'+esc(q.elim)+'</div>'
+    +'<a class="bunpolink" href="bunpo.html#'+q.u+'">📖 この単元の解説を読む</a>';
+  exp.className="exp on";
+  document.getElementById("nextbtn").className="nextbtn on";
+  const answeredCnt=Object.keys(state.ans).length;
+  document.getElementById("hstat").textContent="診断 "+answeredCnt+"/"+QUESTIONS.length;
+  document.getElementById("hbar").style.width=(answeredCnt/QUESTIONS.length*100)+"%";
+}
+function nextQ(){
+  answered=false;qi++;
+  if(qi>=queue.length){showResult();return;}
+  showQ();
+}
+function showResult(){
+  document.getElementById("rscore").textContent=runCorrect+" / "+queue.length;
+  let msg="";
+  if(mode==="unit"){
+    const u=UNITS.find(x=>x.id===curUnit),s=unitStatus(curUnit);
+    msg=u.g+"「"+u.name+"」→ "+(s.st==="ok"?"◎ 分かってる":s.st==="mid"?"△ まだ怪しい":"✕ ここが崩れてる");
+  }else if(mode==="wrong"){
+    msg="間違えたやつの解き直し完了。マップの色を確認。";
+  }else{
+    msg="診断おつかれさま。マップで崩れの起点を確認。";
+  }
+  document.getElementById("rmsg").textContent=msg;
+  show("scr-result");
+}
+// ===== 診断結果をAIに相談 =====
+function buildDiagPrompt(){
+  const lines=[];
+  lines.push("英文法を中1→高校のカリキュラム順で診断する4択ドリルを解きました。以下が結果です。");
+  lines.push("お願い: (1)間違え方のパターンから「何が分かっていないか」を私の言葉のレベルで言語化して (2)どの単元から復習すべきか、順番と理由を教えて (3)崩れの起点の単元は例文を使って中学生向けに解説して。");
+  lines.push("");
+  lines.push("■単元別の結果（カリキュラム順・◎=3/3 △=2/3 ✕=0〜1/3）");
+  for(const u of UNITS){
+    const s=unitStatus(u.id);
+    const qs=unitQs[u.id],done=qs.filter(q=>q.id in state.ans);
+    const c=done.filter(q=>state.ans[q.id].ok).length;
+    const mark=s.st==="ok"?"◎":s.st==="mid"?"△":s.st==="ng"?"✕":"（未診断 "+done.length+"/"+qs.length+"回答）";
+    lines.push("・"+u.g+"「"+u.name+"」: "+mark+(s.st!=="none"?" "+c+"/3":""));
+  }
+  const b=firstBreak();
+  if(b.firstNg)lines.push("\n崩れの起点（最初の✕）: "+b.firstNg.g+"「"+b.firstNg.name+"」");
+  const wrong=QUESTIONS.filter(q=>state.ans[q.id]&&!state.ans[q.id].ok);
+  if(wrong.length){
+    lines.push("\n■間違えた問題（日本語 / 英文 / 自分の答え → 正解）");
+    for(const q of wrong){
+      const u=UNITS.find(x=>x.id===q.u);
+      lines.push("・["+u.g+"・"+u.name+"] "+q.jp+" / "+q.en+" / 自分:「"+q.o[state.ans[q.id].sel]+"」→ 正解:「"+q.o[q.a]+"」");
+    }
+  }else{
+    lines.push("\n（間違えた問題は現在ゼロ）");
+  }
+  return lines.join("\n");
+}
+function copyDiagPrompt(){
+  if(!Object.keys(state.ans).length){showToast("まだ回答がない。先に診断を進めて");return;}
+  const text=buildDiagPrompt();
+  const done=()=>showToast("📋 コピーした。KiroやClaudeに貼り付けて相談できる");
+  const fail=()=>{
+    const ta=document.createElement("textarea");
+    ta.value=text;document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");done();}catch(e){showToast("コピーできなかった。もう一度試して");}
+    document.body.removeChild(ta);
+  };
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(fail);
+  }else{fail();}
+}
+let toastTimer=null;
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.classList.add("on");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove("on"),2600);
+}
+renderHome();
+// 解説ページの「▶ この単元をドリルで確認」から来た時（#u=単元id）はその単元を直接起動
+if(location.hash.startsWith("#u=")){
+  const uid=location.hash.slice(3);
+  history.replaceState(null,"",location.pathname);
+  if(unitQs[uid])startUnit(uid);
+}
+</script>
+</body>
+</html>

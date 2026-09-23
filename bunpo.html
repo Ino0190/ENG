@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>英文法 用語なし解説</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0f1420; --card:#1a2233; --card2:#222d44;
+  --line:#2e3a52; --text:#e8edf5; --sub:#9fb0c8;
+  --accent:#5aa7ff; --ok:#2ecc71; --ng:#e74c3c; --gold:#f1c40f;
+}
+html,body{background:var(--bg);color:var(--text);font-family:-apple-system,'Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,sans-serif;font-size:17px;line-height:1.8;-webkit-text-size-adjust:100%}
+body{padding:0 16px 60px;max-width:760px;margin:0 auto}
+header{position:sticky;top:0;z-index:10;background:rgba(15,20,32,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 0;margin:0 -16px 4px;padding-left:16px;padding-right:16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.htitle{font-size:16px;font-weight:700;color:var(--accent)}
+.hnav{display:flex;gap:8px}
+.hnav a{color:var(--sub);font-size:14px;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px}
+h1{font-size:26px;line-height:1.5;margin:26px 0 8px}
+p.lead{color:var(--sub);font-size:16px;margin-bottom:8px}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 10px}
+.toc a{color:var(--text);font-size:14px;text-decoration:none;border:1px solid var(--line);background:var(--card);border-radius:16px;padding:6px 12px}
+.toc .tg{width:100%;font-size:14px;color:var(--sub);font-weight:700;margin-top:8px}
+section{margin-top:52px}
+section h2{font-size:22px;line-height:1.5;margin-bottom:2px}
+section .term{font-size:14px;color:var(--sub);margin-bottom:12px}
+section .term b{color:var(--gold)}
+.core{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;font-size:16px;margin-bottom:14px}
+.exs{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.ex{background:var(--card2);border-radius:10px;padding:12px 16px}
+.ex .e{font-size:18px;font-weight:700}
+.ex .e b{color:var(--accent)}
+.ex .j{font-size:15px;color:var(--sub)}
+.ex .n{font-size:14px;color:var(--gold);margin-top:2px}
+.trap{background:rgba(231,76,60,.1);border:1px solid var(--ng);border-radius:10px;padding:12px 16px;font-size:15px;margin-bottom:14px}
+.trap b{color:var(--ng)}
+.drill{display:inline-block;color:var(--accent);font-size:15px;text-decoration:none;border:1px solid var(--accent);border-radius:10px;padding:8px 14px}
+.transsec{margin-top:64px}
+.trans{width:100%;border-collapse:collapse;font-size:15px;margin-top:14px}
+.trans th,.trans td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+.trans th{background:var(--card);font-size:14px}
+.trans td:first-child{color:var(--gold);white-space:nowrap}
+.gback{font-size:14px;color:var(--sub);margin-top:10px}
+.gback a{color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <div class="htitle">📖 用語なし解説</div>
+  <nav class="hnav"><a href="index.html">▶ ドリル</a><a href="kanryo.html">⏳ 完了形</a><a href="saigakushu.html">🧱 再学習</a><a href="tango.html">🎴 単語帳</a></nav>
+</header>
+<h1>英文法を用語なしで説明する</h1>
+<p class="lead">教科書の用語（不定詞・分詞構文…）は使わずに説明する。用語は各見出しの下と最後の翻訳表に「教科書ではこう呼ぶ」として添えてある。AIや教科書に質問する時だけ使えばいい。</p>
+<div id="toc" class="toc"></div>
+<div id="main"></div>
+<div class="transsec">
+  <h2 style="font-size:22px">翻訳表 — 教科書用語 ⇔ この解説の言い方</h2>
+  <p class="lead">AIに質問する時はこの用語を使うと一発で通じる。</p>
+  <table class="trans" id="trans"><tr><th>教科書用語</th><th>要するに</th></tr></table>
+</div>
+<script src="questions.js"></script>
+<script>
+// BUNPO: 単元ごとの用語なし解説。ex内の<b>は強調（自前データなのでinnerHTMLで出す）
+const BUNPO=[
+{u:"m1be",t:"「です・いる」と「する」は別の動詞",term:"be動詞（am/is/are）と一般動詞",
+core:"英語の動詞は2チームある。<b>am/is/are</b>チーム（意味は「です・いる」だけ）と、<b>play/like/run</b>チーム（「〜する」全部）。1つの文にはどちらか1つだけ。疑問文・否定文の作り方もチームで違う。am/is/areチームは本人を前に出す（Are you...?）。するチームは応援のdo/doesを呼ぶ（Do you...?）。",
+ex:[["I <b>am</b> a teacher.","私は先生です。","「です」だけ言う時はamチーム"],["I <b>play</b> soccer.","私はサッカーをする。","「する」ことがあるならこっち"],["<b>Do</b> you like music?","音楽は好き？","likeは「する」チーム→doを呼ぶ"]],
+trap:"<b>Are you like music? が最頻出ミス。</b>「〜ですか？」の響きにつられてAreを使いたくなるが、like（する側）の文にam/is/areは出てこない。"},
+{u:"m1s",t:"he / she の時だけ動詞にsが付く",term:"三単現のs（三人称・単数・現在）",
+core:"主語が「私」「あなた」「複数の人たち」<b>以外</b>（彼・彼女・それ・1人の誰か）の時、現在の文では動詞にsが付く。live→lives。疑問文・否定文で<b>does</b>を呼んだら、sはdoesが吸収するので動詞は元の形に戻る。",
+ex:[["She <b>lives</b> in Tokyo.","彼女は東京に住んでいる。","she→sが付く"],["<b>Does</b> she <b>live</b> in Tokyo?","彼女は東京に住んでいますか。","doesがsを吸収→livesに戻さない"]],
+trap:"<b>Does she lives...? とsを二重に付けるのが定番ミス。</b>sは1文に1回だけ。doesに払ったら動詞からは消す。"},
+{u:"m1pro",t:"「は・の・を」で単語の形が変わる",term:"代名詞の格（主格・所有格・目的格・所有代名詞）",
+core:"日本語は「彼<b>は</b>/彼<b>の</b>/彼<b>を</b>」と助詞で区別するが、英語は単語そのものが変わる: he / his / him。置く場所で決まる。動詞の前（〜は）=he、名詞の前（〜の）=his、動詞や前置詞の後ろ（〜を・〜に）=him。「彼のもの」と名詞を付けずに言い切る形（his、私のものならmine）もある。",
+ex:[["I know <b>him</b>.","私は彼を知っている。","動詞の後ろ=「を」の形"],["This is <b>her</b> bag.","これは彼女のかばん。","名詞の前=「の」の形"],["This bag is <b>hers</b>.","このかばんは彼女のもの。","名詞なしで言い切る形"]],
+trap:"<b>迷ったら位置を見る。</b>意味（誰か）でなく、動詞の前か後ろか、名詞が続くかで形が決まる。"},
+{u:"m1ing",t:"「今まさにやってる最中」は be動詞+〜ing",term:"現在進行形・状態動詞",
+core:"いつもの習慣（I run every day）と、今まさに（I <b>am running</b> now）は形が違う。「最中」は<b>be動詞+〜ing</b>のセット。〜ingだけでは文にならない。know・like・have（持ってる）など「状態」を表す動詞は、最中もなにもないので〜ingにしない。",
+ex:[["She <b>is running</b> now.","彼女は今走っている。","be動詞+ingのセット"],["I <b>know</b> him.","私は彼を知っている。","「知っている」でも状態なので現在形"]],
+trap:"<b>疑問文でDoを呼ばない。</b>be動詞が入った文なのでbe動詞を前に出すだけ（Are they watching TV?）。Do they watching は2チームの混線。"},
+{u:"m1can",t:"can の後ろは動詞の元の形",term:"助動詞・原形・命令文",
+core:"can（できる）を動詞の前に置いたら、後ろの動詞は<b>必ず元の形</b>。she can swims とsを付けない。疑問文はcanを前に出すだけで、do/doesは呼ばない（前に出る係は1人だけ）。命令文は主語を省いて動詞の元の形から始める（Open the window.）。",
+ex:[["She can <b>swim</b> fast.","彼女は速く泳げる。","canの後ろはsなしの元の形"],["<b>Can</b> he play the piano?","彼はピアノが弾けますか。","canを前に出すだけ"]],
+trap:"<b>Does he can play...? は×。</b>前に出る係（do/does/can）は1つの文に1人だけ。"},
+{u:"m2past",t:"終わった話は動詞を過去の形に",term:"過去形・不規則動詞・過去進行形",
+core:"昨日・先週など「終わった話」は動詞の形が変わる。play→played が基本、go→went のように独自変化する動詞もある。否定・疑問は<b>did</b>（doの過去）を呼び、動詞は元の形に戻る（didn't study）。「その時〜していた最中」は<b>was/were+〜ing</b>。",
+ex:[["I <b>went</b> to the library yesterday.","昨日図書館へ行った。","goの独自変化"],["He <b>didn't study</b> last night.","昨夜勉強しなかった。","didが過去を背負う→動詞は元の形"],["She <b>was taking</b> a bath when I called.","電話した時、お風呂に入っていた。","過去の「最中」"]],
+trap:"<b>didn't studied は×。</b>過去はdidが背負う。sと同じで1文に1回だけ。"},
+{u:"m2fut",t:"これからの話 — will と be going to",term:"未来表現（will / be going to）",
+core:"2つある。<b>will</b>=その場で決めたこと・根拠のない予想。<b>be going to</b>=前から決めていた予定・目の前の兆候から「〜しそう」。どちらも後ろは動詞の元の形（will <b>be</b> busy。will is は×）。",
+ex:[["OK, I <b>will open</b> the door.","じゃあ私が開けるよ。","今その場で決めた=will"],["Look at those clouds. It <b>is going to</b> rain.","あの雲を見て。降りそうだ。","目の前の兆候=be going to"]],
+trap:"<b>He will is busy は×。</b>willの後ろは元の形。isの元の形はbe。"},
+{u:"m2aux",t:"動詞の前に置く「気持ちの部品」",term:"助動詞（must / have to / should / may）",
+core:"must（しなきゃ／〜に違いない）、should（した方がいい）、may（してもいい／かもしれない）。全部、後ろは動詞の元の形。mustには「義務」と「推量（〜に違いない）」の2つの顔がある。",
+ex:[["You <b>don't have to</b> work today.","今日は働かなくてもいい。","「不要」はこっち"],["You <b>must not</b> open it.","開けてはいけない。","must not は「禁止」"],["He <b>must</b> be sick.","彼は病気に違いない。","mustのもう1つの顔=強い推量"]],
+trap:"<b>must not（禁止）と don't have to（不要）の取り違えが最頻出。</b>日本語の「〜なくてもいい」を見たら don't have to。"},
+{u:"m2inf",t:"to+動詞 = 万能パーツ（こと・ために・ための）",term:"不定詞（名詞的・副詞的・形容詞的用法）",
+core:"<b>to+動詞の元の形</b>は3つの働きをする万能パーツ。①「〜すること」（I like <b>to play</b>）②「〜するために」（went to the store <b>to buy</b> a book）③名詞のうしろに付けて「〜するための」（something <b>to drink</b>）。全部同じ形なので、日本語のどれに当たるかを文の流れで読む。",
+ex:[["I like <b>to play</b> soccer.","サッカーをすることが好き。","①こと"],["He went to the store <b>to buy</b> a book.","本を買うために店へ行った。","②ために"],["I want something <b>to drink</b>.","何か飲むものが欲しい。","③ための（うしろから修飾）"]],
+trap:"<b>「〜するために」を for buy と書くのが日本人最頻出ミス。</b>「ために」に釣られてforを使わない。to+元の形。"},
+{u:"m2ger",t:"動詞+ing = 「〜すること」にもなる",term:"動名詞",
+core:"〜ingには「最中」の他に「<b>〜すること</b>」の顔がある。enjoy・finish・stopの後ろは〜ingだけ（enjoy <b>playing</b>）。stopは相方で意味が変わる: stop <b>singing</b>=歌うのをやめる / stop <b>to sing</b>=歌うために立ち止まる。look forward to のtoは「to+元の形」のtoではないので、後ろは〜ing。",
+ex:[["He enjoyed <b>playing</b> tennis.","テニスを楽しんだ。","enjoyの後ろは〜ing一択"],["He stopped <b>singing</b>.","歌うのをやめた。","to singだと「歌うために立ち止まった」"],["I'm looking forward to <b>seeing</b> her.","彼女に会うのが楽しみ。","このtoの後ろは〜ing"]],
+trap:"<b>to を見たら反射的に元の形、が通用しない場所がある。</b>look forward to / be used to のtoは別物。"},
+{u:"m2comp",t:"「より」「いちばん」「同じくらい」",term:"比較級・最上級・原級（as 〜 as）",
+core:"短い単語はうしろに-er/-est（long→longer→longest）。長い単語は前にmore/most（more difficult）。<b>as 〜 as</b>（同じくらい）の間は元の形のまま。",
+ex:[["This bridge is <b>longer than</b> that one.","この橋はあの橋より長い。","-er + than のセット"],["This question is <b>more difficult</b> than that one.","この問題の方が難しい。","長い単語はmore"],["He is <b>as tall as</b> me.","彼は私と同じくらい背が高い。","as〜asの間は元の形"]],
+trap:"<b>difficulter という単語は存在しない。as taller as も×。</b>長い単語=more、as〜asの間=元の形。"},
+{u:"m2conj",t:"文と文を繋ぐ言葉 ＋ if の罠",term:"接続詞（when / if / because / that）・時条件の副詞節",
+core:"when（〜の時）・if（もし）・because（なぜなら）・that（〜ということ）で文2つを1文にする。最大の罠: <b>「もし明日雨なら」のifの中は、未来の話でも現在形</b>（If it <b>rains</b> tomorrow）。willは主節側（I <b>will</b> stay home）に置く。",
+ex:[["If it <b>rains</b> tomorrow, I will stay home.","もし明日雨なら家にいる。","ifの中は現在形"],["I think <b>that</b> he is honest.","彼は正直だと思う。","「〜ということ」のthat（省略可）"],["<b>When</b> I came home, my mother was cooking.","帰宅した時、母は料理中だった。","during（前置詞）は文を繋げない"]],
+trap:"<b>If it will rain は×。</b>ただしこのルールは「時・条件」の話だけ。「いつ来る<b>か</b>」（質問の埋め込み）ならwillを使っていい→間接疑問の単元へ。"},
+{u:"m2svoc",t:"動詞の後ろの語順パターン",term:"文型（SVOO・SVOC）・There is/are",
+core:"<b>give 人 物</b>（人が先。物を先にするなら give 物 to 人）。<b>call A B</b>（AをBと呼ぶ。順序が命）。「〜がある」は<b>There is/are</b>で、is/areは後ろの名詞に合わせる。",
+ex:[["My father gave <b>me a watch</b>.","父は私に時計をくれた。","人→物の順"],["We call <b>the dog Pochi</b>.","その犬をポチと呼ぶ。","呼ばれる方が先"],["There <b>are</b> three books on the desk.","机に本が3冊ある。","三冊=複数→are"]],
+trap:"<b>「ある」をhaveで考えて There have としない。</b>There is/are は丸ごと「〜がある」の型。"},
+{u:"m3pass",t:"「される」側を主語にする形",term:"受動態（受け身）・過去分詞",
+core:"「する側」が主語なら普通の文、「される側」を主語にするなら<b>be動詞+動詞の変化形パート3</b>（過去分詞。clean→cleaned、break→broken）。時制はbe動詞側で変える（is cleaned=される / was cleaned=された）。見分けの全て: <b>〜ing=する側、過去分詞=される側</b>。",
+ex:[["This room <b>is cleaned</b> every day.","この部屋は毎日掃除される。","部屋=される側"],["The window <b>was broken</b> by him.","窓は彼に割られた。","過去はwasにするだけ"]],
+trap:"<b>is cleaning（している最中）との取り違えが最頻出。</b>主語が「する側」か「される側」かをまず決める。"},
+{u:"m3perf",t:"過去と今が線で繋がってる形",term:"現在完了（継続・経験・完了）",
+core:"<b>have+過去分詞</b>。過去形が「終わった話（点）」なのに対し、これは「過去から今まで繋がってる話（線）」。①ずっと〜している（for/sinceが目印）②〜したことがある（経験）③ちょうど〜したところ。<b>yesterday など過去の一点を指す言葉とは一緒に使えない</b>（線と点で矛盾するから）。",
+ex:[["I <b>have lived</b> in Tokyo for three years.","3年間ずっと東京に住んでいる。","線の話"],["I <b>have been</b> to Kyoto once.","京都に行ったことがある。","経験はhave been to"],["He <b>has just finished</b> his homework.","ちょうど終えたところ。","完了"]],
+trap:"<b>have gone to は「行ってしまって今いない」。</b>「行ったことがある」のつもりでhave goneを使うと意味が変わる。"},
+{u:"m3inf2",t:"to+動詞の応用3パターン",term:"形式主語（It is ... to）・want 人 to・疑問詞+to",
+core:"①<b>It is ... for 人 to 〜</b>=「〜することは人にとって…だ」。Itは仮置きで、本当の主語はto以下。②<b>want 人 to 〜</b>=「人に〜してほしい」（自分がしたいならwant to）。③<b>how to 〜</b>=「〜のしかた」（what to do / when to start も同じ型）。",
+ex:[["<b>It</b> is difficult <b>for me to speak</b> English.","英語を話すことは私には難しい。","Itは仮置き"],["I want <b>you to read</b> this book.","あなたに読んでほしい。","間に人を挟む"],["I don't know <b>how to get</b> to the station.","駅への行き方が分からない。","疑問の言葉+to"]],
+trap:"<b>for me と of me の使い分け。</b>基本はfor。kind/niceなど「人柄を褒める」形容詞の時だけof（It is kind of you）。"},
+{u:"m3part",t:"名詞のうしろに説明をぶら下げる①（1語の説明）",term:"分詞の後置修飾（現在分詞・過去分詞）",
+core:"名詞に説明を足す時、説明が2語以上なら名詞の<b>うしろ</b>にぶら下げる。The boy <b>running over there</b>（あそこで走ってる少年）、a car <b>made in Japan</b>（日本で作られた車）。選ぶ形は2択だけ: <b>する側=〜ing、される側=過去分詞</b>。受け身の単元と同じ判定。",
+ex:[["The boy <b>running over there</b> is my brother.","向こうで走ってる少年は弟だ。","少年=走る側"],["This is a car <b>made in Japan</b>.","日本で作られた車。","車=作られる側"]],
+trap:"<b>ぶら下げた説明の中にis を入れない。</b>The boy is running over there is... と動詞が2つになったら壊れてるサイン。"},
+{u:"m3rel",t:"名詞に文を丸ごとぶら下げる",term:"関係代名詞（who / which / that・目的格の省略）",
+core:"説明が「文まるごと」の時は接着剤を挟む: 人なら<b>who</b>、物なら<b>which</b>（どちらもthatでOK）。ぶら下げる文には「誰が」か「何を」の<b>穴</b>が開いている（an uncle who <b>___</b> lives in New York=「誰が」の穴）。「何を」の穴の時は接着剤ごと省略できる（the book he wrote）。",
+ex:[["I have an uncle <b>who lives</b> in New York.","NYに住むおじがいる。","人+「誰が」の穴"],["This is the book <b>which he wrote</b>.","彼が書いた本。","物+「何を」の穴"],["The pictures <b>she took</b> were beautiful.","彼女が撮った写真は美しかった。","接着剤を省略した形"]],
+trap:"<b>ぶら下げた文の中に it / them を残さない。</b>which he wrote <s>it</s>=接着剤が既に「それ」の代役なので二重になる。"},
+{u:"m3indq",t:"質問を文の中に埋め込むと語順が戻る",term:"間接疑問文",
+core:"Where <b>does he live</b>?（独立した質問）を Do you know の中に入れると、where <b>he lives</b> になる。<b>疑問文の語順（does he）は独立した質問専用</b>。埋め込んだら普通の文の語順に戻し、doesに払っていたsを動詞に返す。",
+ex:[["Do you know where <b>he lives</b>?","彼がどこに住んでるか知ってる？","語順が戻り、sも戻る"],["Tell me when <b>he will come</b>.","いつ来るのか教えて。","埋め込んだ質問の中はwillOK"]],
+trap:"<b>Do you know where does he live? が最頻出ミス。</b>1つの文で前に出る係は1人だけ。中に入れたらdoesは消える。"},
+{u:"h1tense",t:"過去のさらに前 ＋ ずっと最中",term:"過去完了（had+過去分詞）・現在完了進行形",
+core:"過去の話の中で「それより前」を言う時は<b>had+過去分詞</b>（駅に着いた時には、電車は出発していた）。時間が2段あるのが目印。「2時間ずっとやってる最中」のように<b>動作が今も続く</b>時はhave been+〜ing。",
+ex:[["When I got to the station, the train <b>had already left</b>.","着いた時には出発していた。","過去より前の話"],["She <b>has been playing</b> tennis for two hours.","2時間ずっとテニスをしている。","線+最中"]],
+trap:"<b>過去の文の中でhave+過去分詞は使えない。</b>基準が過去に移ったら、線の話は全部hadに切り替わる。"},
+{u:"h1subj",t:"現実じゃない妄想は、時制を1段ずらす",term:"仮定法過去・仮定法過去完了",
+core:"本当にあり得る条件（If it rains tomorrow=中2のif）と違い、「もしお金があれば（実際はない）」という<b>現実に反する妄想は、形だけ過去にずらす</b>: If I <b>had</b> money, I <b>would</b> buy the car。過去の妄想「あの時勉強してたら」はもう1段ずらしてIf I <b>had studied</b>, I <b>would have passed</b>。be動詞は誰が主語でも<b>were</b>。",
+ex:[["If I <b>had</b> money, I <b>would buy</b> the car.","お金があれば買うのに。","形は過去・意味は現在"],["If I <b>had studied</b> harder, I <b>would have passed</b> the exam.","勉強してたら受かってたのに。","過去の妄想は2段ずらし"],["If I <b>were</b> you, I wouldn't say that.","私があなたなら言わない。","仮定法のbe動詞はwere"]],
+trap:"<b>ずらし=妄想のサイン。</b>形が過去なのに「今」の話をしていたら仮定法。逆に、本当にあり得る話ならずらさない（中2のifのまま）。"},
+{u:"h1auxp",t:"気持ちの部品 + have+過去分詞 = 過去に飛ぶ",term:"助動詞+完了形（should/must/can't have done）",
+core:"should（すべき）・must（に違いない）・can't（はずがない）の意味はそのまま、<b>後ろをhave+過去分詞にすると話が過去に飛ぶ</b>。should have gone=行くべきだった（のに行かなかった＝後悔）。must have been=だったに違いない。can't have said=言ったはずがない。",
+ex:[["You <b>should have gone</b> to the doctor.","医者に行くべきだった（のに）。","過去への後悔・非難"],["He <b>must have been</b> tired.","疲れていたに違いない。","過去への推量"],["She <b>can't have said</b> such a thing.","言ったはずがない。","mustの否定はcan'tになる"]],
+trap:"<b>「〜したに違いない」の反対はmust notでなくcan't have。</b>この非対称は理屈より丸ごと覚える方が早い。"},
+{u:"h1partc",t:"接続詞を省いて 〜ing で文を始める",term:"分詞構文",
+core:"When I walked in the park, I met... の接続詞と主語を省いて<b>Walking in the park, I met...</b>。判定は文の主語とセット: 主語が「する側」なら〜ing、「される側」なら過去分詞（<b>Seen</b> from the mountain, the lake looks...=湖は見られる側）。否定はNotを先頭に。",
+ex:[["<b>Walking</b> in the park, I met an old friend.","公園を歩いていて旧友に会った。","私=歩く側"],["<b>Seen</b> from the top of the mountain, the lake looks like the sea.","山頂から見ると湖は海のようだ。","湖=見られる側"],["<b>Not knowing</b> what to say, I kept silent.","何と言えばいいか分からず黙っていた。","否定はNotが先頭"]],
+trap:"<b>Seeing from the mountain, the lake... が最頻出の引っかけ。</b>「（人が）見ると」と訳につられない。主語のlakeが見る側か見られる側かで決める。"},
+{u:"h1rel2",t:"名詞に文をぶら下げる②（場所・時・理由）",term:"関係副詞（where / when / why）・前置詞+関係代名詞",
+core:"the town <b>where</b> I was born（生まれた町）。whichとの見分けは<b>ぶら下げた文に穴があるか</b>: 穴なし（I was bornで完全）→where/when/why、穴あり→which。whichで言うなら前置詞を戻す（the house <b>in which</b> I lived）。<b>前置詞の直後に置けるのはwhichだけ</b>（in where / in that は存在しない形）。",
+ex:[["This is the town <b>where</b> I was born.","私が生まれた町。","文が完全→where"],["This is the house <b>in which</b> I lived.","私が住んでいた家。","前置詞+which"],["Do you know the reason <b>why</b> he was late?","遅刻した理由を知ってる？","理由はwhy"]],
+trap:"<b>where か which かで迷ったら、ぶら下げた文だけ取り出して読む。</b>それだけで文として完成していればwhere、「何が/何を」が欠けていればwhich。"},
+];
+</script>
+<script>
+// 描画: 目次・各単元セクション・翻訳表
+(function(){
+  const uMap={};UNITS.forEach(u=>uMap[u.id]=u);
+  // 目次（学年ごと）
+  const toc=document.getElementById("toc");
+  let tocHtml="",lastG="";
+  for(const b of BUNPO){
+    const g=uMap[b.u].g;
+    if(g!==lastG){tocHtml+='<div class="tg">'+g+'</div>';lastG=g;}
+    tocHtml+='<a href="#'+b.u+'">'+b.t+'</a>';
+  }
+  toc.innerHTML=tocHtml;
+  // 本文
+  const main=document.getElementById("main");
+  main.innerHTML=BUNPO.map(b=>{
+    const u=uMap[b.u];
+    const exs=b.ex.map(e=>'<div class="ex"><div class="e">'+e[0]+'</div><div class="j">'+e[1]+'</div>'+(e[2]?'<div class="n">→ '+e[2]+'</div>':'')+'</div>').join("");
+    return '<section id="'+b.u+'"><h2>'+b.t+'</h2>'
+      +'<div class="term">'+u.g+'　教科書ではこう呼ぶ: <b>'+b.term+'</b></div>'
+      +'<div class="core">'+b.core+'</div>'
+      +'<div class="exs">'+exs+'</div>'
+      +'<div class="trap">🪤 '+b.trap+'</div>'
+      +'<a class="drill" href="index.html#u='+b.u+'">▶ この単元をドリルで確認（3問）</a>'
+      +'</section>';
+  }).join("");
+  // 翻訳表
+  const tbl=document.getElementById("trans");
+  tbl.innerHTML+=BUNPO.map(b=>'<tr><td>'+b.term+'</td><td><a href="#'+b.u+'" style="color:inherit">'+b.t+'</a></td></tr>').join("");
+})();
+</script>
+</body>
+</html>

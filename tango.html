@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>英単語 どっち — 繰り返しで覚える</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0f1420; --card:#1a2233; --card2:#222d44;
+  --line:#2e3a52; --text:#e8edf5; --sub:#9fb0c8;
+  --accent:#f1c40f; --ok:#2ecc71; --ng:#e74c3c; --blue:#5aa7ff;
+}
+html,body{background:var(--bg);color:var(--text);font-family:-apple-system,'Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,sans-serif;font-size:17px;line-height:1.7;-webkit-text-size-adjust:100%}
+body{padding:0 0 60px;max-width:680px;margin:0 auto;min-height:100vh}
+header{position:sticky;top:0;z-index:10;background:rgba(15,20,32,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.htitle{font-size:16px;font-weight:700;color:var(--accent)}
+.hnav{display:flex;gap:8px}
+.hnav a{color:var(--sub);font-size:14px;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px}
+.screen{display:none;padding:18px 16px}
+.screen.on{display:block}
+h1{font-size:24px;line-height:1.4;margin-bottom:6px}
+p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
+.deck{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:12px;cursor:pointer;transition:.15s;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.deck:active{transform:scale(.98)}
+.deck h3{font-size:17px;margin-bottom:2px}
+.deck p{font-size:14px;color:var(--sub)}
+.deck .stat{flex:none;text-align:right;font-size:14px;color:var(--sub)}
+.deck .stat .m{color:var(--ok);font-weight:700}
+.deck .stat .bad{color:var(--ng);font-weight:700}
+.breakbn{background:rgba(231,76,60,.12);border:1px solid var(--ng);border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:15px;line-height:1.7}
+.breakbn b{color:var(--ng)}
+.breakbn.okbn{background:rgba(46,204,113,.1);border-color:var(--ok);color:var(--sub)}
+.badge{display:inline-block;background:rgba(231,76,60,.15);border:1px solid var(--ng);color:var(--ng);border-radius:12px;padding:1px 9px;font-size:13px;font-weight:700;margin-top:3px}
+.alldone{color:var(--ok);font-size:14px;font-weight:700}
+/* 出題 */
+.qmeta{display:flex;justify-content:space-between;font-size:13px;color:var(--sub);margin-bottom:10px}
+.qmeta .dir{color:var(--accent);font-weight:700}
+.wcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 18px;margin-bottom:16px;text-align:center}
+.wcard .big{font-size:34px;font-weight:700;line-height:1.4}
+.wcard .exline{font-size:16px;color:var(--sub);margin-top:10px}
+.wcard .exline b{color:var(--accent)}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:16px;font-size:19px;font-weight:700;cursor:pointer;text-align:center;transition:.12s}
+.opt:active{transform:scale(.99)}
+.opt.correct{border-color:var(--ok);background:rgba(46,204,113,.12)}
+.opt.wrong{border-color:var(--ng);background:rgba(231,76,60,.12)}
+.opt.disabled{cursor:default}
+.exp{display:none;margin-top:16px;background:var(--card2);border-radius:12px;padding:16px;font-size:15px;line-height:1.8}
+.exp.on{display:block}
+.exp .verdict{font-size:17px;font-weight:700;margin-bottom:6px}
+.exp .verdict.ok{color:var(--ok)}
+.exp .verdict.ng{color:var(--ng)}
+.exp .hook{background:rgba(241,196,15,.1);border:1px solid var(--accent);border-radius:10px;padding:10px 14px;margin:8px 0}
+.exp .hook b{color:var(--accent)}
+.exp .exen{font-size:16px;font-weight:700;margin-top:8px}
+.exp .exen b{color:var(--accent)}
+.exp .exjp{font-size:14px;color:var(--sub)}
+.exp .loop{margin-top:10px;font-size:14px;color:var(--accent);font-weight:700}
+.nextbtn{margin-top:16px;width:100%;background:var(--accent);border:none;color:#0f1420;border-radius:12px;padding:15px;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit;display:none}
+.nextbtn.on{display:block}
+.homebtn{background:none;border:1px solid var(--line);color:var(--sub);border-radius:10px;padding:8px 14px;font-size:14px;cursor:pointer;font-family:inherit;margin-bottom:14px}
+.result{text-align:center;padding:30px 0}
+.result .big{font-size:40px;font-weight:700;margin-bottom:8px}
+.result p{color:var(--sub);font-size:16px;margin-bottom:20px}
+.result .rbtn{display:block;width:100%;background:var(--card);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px}
+.result .rbtn.main{background:var(--accent);border-color:var(--accent);color:#0f1420}
+</style>
+</head>
+<body>
+<header>
+  <div class="htitle">🎴 英単語 どっち</div>
+  <nav class="hnav"><a href="index.html">▶ ドリル</a><a href="kanryo.html">⏳ 完了形</a><a href="saigakushu.html">🧱 再学習</a><a href="bunpo.html">📖 解説</a></nav>
+</header>
+
+<div class="screen on" id="scr-home">
+  <h1>繰り返しで覚える</h1>
+  <p class="lead">中1→高校のレベル別サンプル。2択で10秒判定、間違えた単語は<b>3回連続で正解するまで</b>出てくる。初見の正答率で「どの帯から崩れてるか」も分かる。</p>
+  <div id="wordbreak"></div>
+  <div id="decks"></div>
+  <div class="deck" onclick="startNeed()" id="deck-need" style="border-color:var(--ng)">
+    <div><h3>🔁 まだ覚えてないやつだけ</h3><p id="needdesc"></p></div>
+  </div>
+  <div class="deck" onclick="resetAll()">
+    <div><h3>🗑 記録をリセット</h3><p>覚えた記録を全部消す</p></div>
+  </div>
+</div>
+
+<div class="screen" id="scr-quiz">
+  <button class="homebtn" onclick="goHome()">← デッキ一覧</button>
+  <div class="qmeta"><span class="dir" id="qdir"></span><span id="qprog"></span></div>
+  <div class="wcard"><div class="big" id="qword"></div><div class="exline" id="qex"></div></div>
+  <div class="opts" id="qopts"></div>
+  <div class="exp" id="qexp"></div>
+  <button class="nextbtn" id="nextbtn" onclick="nextQ()">次へ</button>
+</div>
+
+<div class="screen" id="scr-result">
+  <div class="result">
+    <div class="big" id="rtitle"></div>
+    <p id="rmsg"></p>
+    <button class="rbtn main" onclick="goHome()">デッキ一覧へ</button>
+    <button class="rbtn" id="ragain" onclick="retryDeck()">もう一度</button>
+  </div>
+</div>
+
+<script src="words.js"></script>
+<script>
+// ===== 定着ループ（SAA amida方式） =====
+// 間違えた単語は3回連続正解するまでキューに残る。途中で再ミスしたら3回リセット。
+// 未定着はlocalStorageに保存し、次回起動時もデッキに🔁バッジで引き継ぐ。
+const KEY="tango_need_v1";
+const KEY_FIRST="tango_first_v1";
+let need=loadNeed();           // {単語: 残り連続正解数}
+let first=loadFirst();         // {単語: 1(初見正解)/0(初見不正解)} → レベル診断用
+let queue=[],cur=null,curDeck=null,answered=false;
+let mastered=0,total=0,seen=new Set();
+const byW={};WORDS.forEach(w=>byW[w.w]=w);
+
+function loadNeed(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}}
+function saveNeed(){localStorage.setItem(KEY,JSON.stringify(need))}
+function loadFirst(){try{return JSON.parse(localStorage.getItem(KEY_FIRST))||{}}catch(e){return{}}}
+function saveFirst(){localStorage.setItem(KEY_FIRST,JSON.stringify(first))}
+// レベルごとの初見正答率（診断）。tried=初見回答済み語数
+function deckDiag(did){
+  const ws=WORDS.filter(w=>w.deck===did);
+  const tried=ws.filter(w=>w.w in first);
+  const ok=tried.filter(w=>first[w.w]===1).length;
+  return{n:ws.length,tried:tried.length,ok,rate:tried.length?ok/tried.length:null};
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a}
+// 例文中の単語（不規則変化はexwの形）をハイライト
+function hiEx(w){
+  const base=(w.exw||w.w).replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  return w.ex.replace(new RegExp("\\b"+base+"\\w*","i"),m=>"<b>"+m+"</b>");
+}
+function renderHome(){
+  // 崩れの起点バナー（レベル順で最初に初見正答率が70%を切った帯・8語以上回答してから判定）
+  const bn=document.getElementById("wordbreak");
+  let firstBad=null,anyTried=false;
+  for(const d of WORD_DECKS){
+    const g=deckDiag(d.id);
+    if(g.tried>0)anyTried=true;
+    if(g.tried>=8&&g.rate<0.7){firstBad=d;break;}
+  }
+  if(firstBad){
+    bn.innerHTML='<div class="breakbn">🚧 単語の崩れの起点: <b>'+firstBad.name+'</b>（初見正答率'+Math.round(deckDiag(firstBad.id).rate*100)+'%）<br>この帯を定着ループで固めてから上に進むのが近道。</div>';
+  }else if(anyTried){
+    bn.innerHTML='<div class="breakbn okbn">初見正答率70%を切った帯はまだない。上のレベルへ進んでOK。</div>';
+  }else{bn.innerHTML="";}
+  const el=document.getElementById("decks");
+  el.innerHTML=WORD_DECKS.map(d=>{
+    const ws=WORDS.filter(w=>w.deck===d.id);
+    const needCnt=ws.filter(w=>need[w.w]>0).length;
+    const badge=needCnt?'<span class="badge">🔁 まだ'+needCnt+'語</span>':"";
+    const g=deckDiag(d.id);
+    const diag=g.tried?('<div class="'+(g.rate>=0.7?"m":"bad")+'">初見 '+g.ok+"/"+g.tried+'</div>'):'<div>未診断</div>';
+    return '<div class="deck" onclick="startDeck(\''+d.id+'\')"><div><h3>'+d.name+'</h3><p>'+d.desc+'</p>'+badge+'</div><div class="stat">'+ws.length+'語'+diag+'</div></div>';
+  }).join("");
+  const needWords=WORDS.filter(w=>need[w.w]>0);
+  document.getElementById("needdesc").textContent=needWords.length?needWords.length+"語が定着待ち。3回連続正解で消える。":"今はゼロ。デッキで間違えるとここに溜まる。";
+}
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));document.getElementById(id).classList.add("on")}
+function goHome(){renderHome();show("scr-home")}
+function resetAll(){if(confirm("覚えた記録と診断を全部消す？")){need={};saveNeed();first={};saveFirst();goHome();}}
+
+function startDeck(did){
+  curDeck=did;
+  startRun(shuffle(WORDS.filter(w=>w.deck===did).map(w=>w.w)));
+}
+function startNeed(){
+  const ws=WORDS.filter(w=>need[w.w]>0).map(w=>w.w);
+  if(!ws.length)return;
+  curDeck=null;startRun(shuffle(ws));
+}
+function retryDeck(){curDeck?startDeck(curDeck):startNeed()}
+function startRun(words){
+  queue=words;total=words.length;mastered=0;seen=new Set(words);
+  // 前回からの持ち越し（needに残っている語はそのカウントを引き継ぐ）
+  showQ();show("scr-quiz");
+}
+
+function pickDistractor(word,field){
+  // 同デッキ優先で別の単語の意味/単語を1つ選ぶ
+  const pool=WORDS.filter(w=>w.w!==word.w&&w[field]!==word[field]);
+  const same=pool.filter(w=>w.deck===word.deck);
+  const from=same.length?same:pool;
+  return from[Math.floor(Math.random()*from.length)][field];
+}
+function showQ(){
+  if(!queue.length){showResult();return;}
+  answered=false;
+  const w=byW[queue[0]];
+  // 英→日 / 日→英 をランダムに切り替え（両方向で覚える）
+  const dir=Math.random()<0.5?"e2j":"j2e";
+  cur={w,dir};
+  document.getElementById("qdir").textContent=dir==="e2j"?"意味はどっち？":"英語はどっち？";
+  document.getElementById("qprog").textContent="残り "+queue.length+"語（覚えた "+mastered+"/"+total+"）";
+  const ex=hiEx(w);
+  if(dir==="e2j"){
+    document.getElementById("qword").textContent=w.w;
+    document.getElementById("qex").innerHTML=ex;
+    setOpts([w.jp,pickDistractor(w,"jp")],w.jp);
+  }else{
+    document.getElementById("qword").textContent=w.jp;
+    document.getElementById("qex").innerHTML="　";
+    setOpts([w.w,pickDistractor(w,"w")],w.w);
+  }
+  document.getElementById("qexp").className="exp";
+  document.getElementById("nextbtn").className="nextbtn";
+  window.scrollTo(0,0);
+}
+function setOpts(arr,correct){
+  shuffle(arr);
+  document.getElementById("qopts").innerHTML=arr.map(t=>'<div class="opt" data-v="'+t.replace(/"/g,"&quot;")+'" onclick="answer(this)">'+t+'</div>').join("");
+  document.getElementById("qopts").dataset.correct=correct;
+}
+function answer(el){
+  if(answered)return;answered=true;
+  const correct=document.getElementById("qopts").dataset.correct;
+  const ok=el.dataset.v===correct;
+  const w=cur.w;
+  document.querySelectorAll(".opt").forEach(o=>{
+    o.classList.add("disabled");o.onclick=null;
+    if(o.dataset.v===correct)o.classList.add("correct");
+    else if(o===el)o.classList.add("wrong");
+  });
+  // 初見の結果を記録（レベル診断用・上書きしない）
+  if(!(w.w in first)){first[w.w]=ok?1:0;saveFirst();}
+  // 定着ループ更新
+  let loopMsg="";
+  if(ok){
+    if(need[w.w]>0){
+      need[w.w]--;
+      if(need[w.w]<=0){delete need[w.w];loopMsg="🎉 3回連続正解＝定着した";queue.shift();mastered++;}
+      else{loopMsg="あと"+need[w.w]+"回連続で正解すると定着";
+        // 数問後に再登場させる（先頭から抜いて3つ後ろへ）
+        queue.shift();queue.splice(Math.min(3,queue.length),0,w.w);}
+    }else{queue.shift();mastered++;}
+  }else{
+    need[w.w]=3;loopMsg="3回連続で正解すると定着（間違えたのでリセット）";
+    queue.shift();queue.splice(Math.min(3,queue.length),0,w.w);
+  }
+  saveNeed();
+  const ex=hiEx(w);
+  const exp=document.getElementById("qexp");
+  exp.innerHTML='<div class="verdict '+(ok?"ok":"ng")+'">'+(ok?"⭕ 正解":"❌ 不正解")+'　<span style="font-size:15px;color:var(--text)">'+w.w+" = "+w.jp+'</span></div>'
+    +'<div class="hook">💡 <b>'+w.hook+'</b></div>'
+    +'<div class="exen">'+ex+'</div><div class="exjp">'+w.exjp+'</div>'
+    +(loopMsg?'<div class="loop">🔁 '+loopMsg+'</div>':"");
+  exp.className="exp on";
+  document.getElementById("nextbtn").className="nextbtn on";
+}
+function nextQ(){showQ()}
+function showResult(){
+  document.getElementById("rtitle").textContent=mastered+" / "+total;
+  const remainAll=WORDS.filter(w=>need[w.w]>0).length;
+  document.getElementById("rmsg").textContent=remainAll?"このセットは完走。全体では定着待ちが"+remainAll+"語ある（🔁から再挑戦）。":"🎉 定着待ちゼロ。全部覚えた状態。";
+  show("scr-result");
+}
+renderHome();
+</script>
+</body>
+</html>

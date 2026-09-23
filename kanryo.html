@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>現在完了 — 型で見分けて文で覚える</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0f1420; --card:#1a2233; --card2:#222d44;
+  --line:#2e3a52; --text:#e8edf5; --sub:#9fb0c8;
+  --accent:#f1c40f; --ok:#2ecc71; --ng:#e74c3c; --blue:#5aa7ff;
+}
+html,body{background:var(--bg);color:var(--text);font-family:-apple-system,'Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,sans-serif;font-size:17px;line-height:1.7;-webkit-text-size-adjust:100%}
+body{padding:0 0 60px;max-width:680px;margin:0 auto;min-height:100vh}
+header{position:sticky;top:0;z-index:10;background:rgba(15,20,32,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.htitle{font-size:16px;font-weight:700;color:var(--accent)}
+.hnav{display:flex;gap:8px}
+.hnav a{color:var(--sub);font-size:14px;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px}
+.screen{display:none;padding:18px 16px}
+.screen.on{display:block}
+h1{font-size:24px;line-height:1.4;margin-bottom:6px}
+p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
+.modes{display:flex;gap:10px;margin-bottom:18px}
+.mode{flex:1;background:var(--accent);border:none;color:#0f1420;border-radius:12px;padding:14px 8px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}
+.mode.sub{background:var(--card);color:var(--text);border:1px solid var(--line)}
+.deck{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:.15s;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.deck:active{transform:scale(.98)}
+.deck h3{font-size:17px;margin-bottom:3px}
+.deck .form{font-size:15px;color:var(--blue);font-weight:700}
+.deck .cue{font-size:14px;color:var(--sub)}
+.deck .stat{flex:none;text-align:right;font-size:14px;color:var(--sub)}
+.deck .stat .m{color:var(--ok);font-weight:700}
+.deck .stat .bad{color:var(--ng);font-weight:700}
+.badge{display:inline-block;background:rgba(231,76,60,.15);border:1px solid var(--ng);color:var(--ng);border-radius:12px;padding:1px 9px;font-size:13px;font-weight:700;margin-top:3px}
+.homebtn{background:none;border:1px solid var(--line);color:var(--sub);border-radius:10px;padding:8px 14px;font-size:14px;cursor:pointer;font-family:inherit;margin-bottom:14px}
+.qmeta{display:flex;justify-content:space-between;font-size:13px;color:var(--sub);margin-bottom:10px}
+.qmeta .dir{color:var(--accent);font-weight:700}
+/* 覚えるモード */
+.jpcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px 18px;margin-bottom:14px;text-align:center}
+.jpcard .jp{font-size:22px;font-weight:700;line-height:1.6}
+.jpcard .hint{font-size:14px;color:var(--sub);margin-top:10px}
+.encard{display:none;background:var(--card2);border:1px solid var(--blue);border-radius:14px;padding:20px 18px;margin-bottom:14px}
+.encard.on{display:block}
+.encard .en{font-size:22px;font-weight:700;line-height:1.6;letter-spacing:.01em}
+.encard .en b{color:var(--accent)}
+.encard .en u,.tcard .exlist u,.exp .full u{color:var(--blue);text-decoration-color:var(--blue)}
+.encard .why{font-size:15px;color:var(--sub);margin-top:12px;line-height:1.8}
+.speak{margin-top:14px;background:var(--card);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 16px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+.bigbtn{width:100%;background:var(--accent);border:none;color:#0f1420;border-radius:12px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px}
+.bigbtn.sub{background:var(--card);color:var(--text);border:1px solid var(--line)}
+.judge{display:none;gap:10px}
+.judge.on{display:flex}
+.judge button{flex:1;border-radius:12px;padding:15px 8px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;border:2px solid}
+.judge .said{background:rgba(46,204,113,.12);border-color:var(--ok);color:var(--ok)}
+.judge .nosaid{background:rgba(231,76,60,.12);border-color:var(--ng);color:var(--ng)}
+</style>
+</head>
+<style>
+/* 4択モード */
+.qcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 18px;margin-bottom:16px}
+.qcard .jp{font-size:17px;color:var(--sub);margin-bottom:10px}
+.qcard .en{font-size:20px;font-weight:700;line-height:1.7}
+.qcard .en .bl{display:inline-block;min-width:110px;border-bottom:2px solid var(--accent);color:var(--accent)}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:15px;font-size:18px;font-weight:700;cursor:pointer;text-align:center;transition:.12s}
+.opt:active{transform:scale(.99)}
+.opt.correct{border-color:var(--ok);background:rgba(46,204,113,.12)}
+.opt.wrong{border-color:var(--ng);background:rgba(231,76,60,.12)}
+.opt.disabled{cursor:default}
+.exp{display:none;margin-top:16px;background:var(--card2);border-radius:12px;padding:16px;font-size:15px;line-height:1.8}
+.exp.on{display:block}
+.exp .verdict{font-size:17px;font-weight:700;margin-bottom:8px}
+.exp .verdict.ok{color:var(--ok)}
+.exp .verdict.ng{color:var(--ng)}
+.exp .full{font-size:18px;font-weight:700;margin:8px 0}
+.exp .full b{color:var(--accent)}
+.exp .cue{background:rgba(90,167,255,.1);border:1px solid var(--blue);border-radius:10px;padding:10px 14px;margin:10px 0;font-size:15px}
+.exp .cue b{color:var(--blue)}
+.exp .loop{margin-top:10px;font-size:14px;color:var(--accent);font-weight:700}
+.nextbtn{margin-top:16px;width:100%;background:var(--accent);border:none;color:#0f1420;border-radius:12px;padding:15px;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit;display:none}
+.nextbtn.on{display:block}
+/* 早見表 */
+.flow{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.flow h3{font-size:18px;color:var(--accent);margin-bottom:10px}
+.flow ol{margin-left:20px;font-size:16px;line-height:2}
+.flow ol b{color:var(--blue)}
+.flow .ans{color:var(--ok);font-weight:700}
+.tcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:10px}
+.tcard h3{font-size:17px;margin-bottom:4px}
+.tcard .form{font-size:17px;color:var(--blue);font-weight:700;margin-bottom:6px}
+.tcard .cue{font-size:14px;color:var(--accent);margin-bottom:8px}
+.tcard .core{font-size:15px;color:var(--text);line-height:1.8}
+.tcard .ng{font-size:14px;color:var(--ng);margin-top:8px}
+.tcard .exlist{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.tcard .exlist div{font-size:15px;margin-bottom:6px;line-height:1.6}
+.tcard .exlist .e{font-weight:700}
+.tcard .exlist .j{color:var(--sub);font-size:14px}
+.result{text-align:center;padding:30px 0}
+.result .big{font-size:40px;font-weight:700;margin-bottom:8px}
+.result p{color:var(--sub);font-size:16px;margin-bottom:20px}
+.result .rbtn{display:block;width:100%;background:var(--card);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px}
+.result .rbtn.main{background:var(--accent);border-color:var(--accent);color:#0f1420}
+</style>
+<body>
+<header>
+  <div class="htitle">⏳ 現在完了</div>
+  <nav class="hnav"><a href="index.html">▶ 診断</a><a href="saigakushu.html">🧱 再学習</a><a href="bunpo.html">📖 解説</a></nav>
+</header>
+
+<div class="screen on" id="scr-home">
+  <h1>型で見分けて、文で覚える</h1>
+  <p class="lead">日本語の「〜している／していた」は英語で8つに分かれる。どの型かを見分けられれば全部解ける。文はそのまま覚えて使える形にしてある。</p>
+  <div class="modes">
+    <button class="mode" onclick="startLearn(null)">📖 覚える（40文）</button>
+    <button class="mode sub" onclick="startQuiz(null)">✏️ 試す（40問）</button>
+  </div>
+  <button class="bigbtn sub" onclick="show('scr-chart')">🔍 見分け方の早見表</button>
+  <div id="types"></div>
+  <div class="deck" onclick="startQuiz('need')" id="deck-need" style="border-color:var(--ng)">
+    <div><h3>🔁 まだ覚えてないやつだけ</h3><p class="cue" id="needdesc"></p></div>
+  </div>
+  <div class="deck" onclick="resetAll()">
+    <div><h3>🗑 記録をリセット</h3><p class="cue">言えた記録と定着記録を全部消す</p></div>
+  </div>
+</div>
+
+<div class="screen" id="scr-learn">
+  <button class="homebtn" onclick="goHome()">← 型の一覧</button>
+  <div class="qmeta"><span class="dir" id="ldir"></span><span id="lprog"></span></div>
+  <div class="jpcard"><div class="jp" id="ljp"></div><div class="hint">英語で言ってみる → タップで答え</div></div>
+  <button class="bigbtn" id="lreveal" onclick="reveal()">答えを見る</button>
+  <div class="encard" id="lencard">
+    <div class="en" id="len"></div>
+    <div class="why" id="lwhy"></div>
+    <button class="speak" onclick="speak(document.getElementById('len').textContent)">🔊 読み上げ</button>
+  </div>
+  <div class="judge" id="ljudge">
+    <button class="said" onclick="judge(true)">⭕ 言えた</button>
+    <button class="nosaid" onclick="judge(false)">❌ 言えなかった</button>
+  </div>
+</div>
+
+<div class="screen" id="scr-quiz">
+  <button class="homebtn" onclick="goHome()">← 型の一覧</button>
+  <div class="qmeta"><span class="dir" id="qdir"></span><span id="qprog"></span></div>
+  <div class="qcard"><div class="jp" id="qjp"></div><div class="en" id="qen"></div></div>
+  <div class="opts" id="qopts"></div>
+  <div class="exp" id="qexp"></div>
+  <button class="nextbtn" id="nextbtn" onclick="nextQ()">次へ</button>
+</div>
+
+<div class="screen" id="scr-chart">
+  <button class="homebtn" onclick="goHome()">← 型の一覧</button>
+  <h1>見分け方</h1>
+  <p class="lead">「〜している」「〜していた」を英語にするとき、上から順に当てはめる。</p>
+  <div id="chartbody"></div>
+</div>
+
+<div class="screen" id="scr-result">
+  <div class="result">
+    <div class="big" id="rtitle"></div>
+    <p id="rmsg"></p>
+    <button class="rbtn main" onclick="goHome()">型の一覧へ</button>
+    <button class="rbtn" id="rextra" style="display:none"></button>
+    <button class="rbtn" id="ragain" onclick="retry()">もう一度</button>
+  </div>
+</div>
+
+<script src="kanryo.js"></script>
+<script>
+// 記録: said=覚えるモードで言えたか / need=定着ループ（4択で間違えたら3回連続正解まで残る）
+const KEY="kanryo_v1";
+let st=load(),said=st.said||{},need=st.need||{};
+let queue=[],cur=null,answered=false,revealed=false;
+let okCount=0,total=0,lastMode=null;
+const byId={};KSENTS.forEach(s=>byId[s.id]=s);
+const typeById={};KTYPES.forEach(t=>typeById[t.id]=t);
+
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}}
+function save(){localStorage.setItem(KEY,JSON.stringify({said,need}))}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));document.getElementById(id).classList.add("on");window.scrollTo(0,0)}
+function goHome(){renderHome();show("scr-home")}
+function sentsOf(t){return t?KSENTS.filter(s=>s.t===t):KSENTS.slice()}
+
+// 英文に印を付ける。blankは黄色太字、決め手の語は青の下線。
+// blankの中にcueが入っている文（Have you ever eaten）があるので、先にblankを退避してから置換する。
+function markEn(s){
+  let h=esc(s.en),b=esc(s.blank);
+  h=h.replace(b,"\u0001");
+  if(s.cue&&!s.blank.includes(s.cue))h=h.replace(esc(s.cue),"<u>"+esc(s.cue)+"</u>");
+  return h.replace("\u0001","<b>"+b+"</b>");
+}
+// 空所を作った英文（4択用）
+function blankEn(s){
+  return esc(s.en).replace(esc(s.blank),'<span class="bl">　　　</span>');
+}
+function speak(text){
+  if(!window.speechSynthesis)return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang="en-US";u.rate=.85;
+  speechSynthesis.speak(u);
+}
+</script>
+<script>
+function renderHome(){
+  document.getElementById("types").innerHTML=KTYPES.map(t=>{
+    const ss=sentsOf(t.id);
+    const sc=ss.filter(s=>said[s.id]===1).length;
+    const nd=ss.filter(s=>need[s.id]>0).length;
+    const badge=nd?'<span class="badge">🔁 '+nd+'文</span>':"";
+    const cls=sc===ss.length?"m":(sc?"":"bad");
+    return '<div class="deck" onclick="startLearn(\''+t.id+'\')">'
+      +'<div><h3>'+t.name+'</h3><div class="form">'+t.form+'</div>'
+      +'<div class="cue">合図: '+t.cue+'</div>'+badge+'</div>'
+      +'<div class="stat"><div class="'+cls+'">言えた '+sc+'/'+ss.length+'</div></div></div>';
+  }).join("");
+  const nd=KSENTS.filter(s=>need[s.id]>0).length;
+  document.getElementById("needdesc").textContent=nd?nd+"文が定着待ち。3回連続で正解すると消える。":"今はゼロ。4択で間違えるとここに溜まる。";
+}
+function renderChart(){
+  const flow='<div class="flow"><h3>上から順に当てはめる</h3><ol>'
+    +'<li><b>「いつ」がある？</b>（last year・yesterday・〜前・in 2020）<br>→ <span class="ans">過去形</span>。完了形は使えない</li>'
+    +'<li><b>for / since がある？</b>（3年間・先週から）<br>→ 動きのある動作なら <span class="ans">have been + ing</span><br>'
+    +'→ live・know のような状態なら <span class="ans">have + 過去分詞</span></li>'
+    +'<li><b>「〜したことがある」？</b>（once・ever・never・〜回）<br>→ <span class="ans">have + 過去分詞</span></li>'
+    +'<li><b>「もう」「ちょうど」「まだ」？</b>（already・just・yet）<br>→ <span class="ans">have + 過去分詞</span></li>'
+    +'<li><b>過去のある時点より前の話？</b>（when 〜した時・before 〜する前）<br>→ <span class="ans">had + 過去分詞</span></li>'
+    +'<li><b>「あの時こうすべきだった」？</b><br>→ <span class="ans">助動詞 + have + 過去分詞</span></li>'
+    +'<li>どれでもなく、今この瞬間の動作<br>→ <span class="ans">am/is/are + ing</span>'
+    +'（ただし know・want・have・like は ing にしない）</li>'
+    +'</ol></div>';
+  const cards=KTYPES.map(t=>{
+    const ex=sentsOf(t.id).map(s=>'<div><span class="e">'+markEn(s)+'</span><br><span class="j">'+esc(s.jp)+'</span></div>').join("");
+    return '<div class="tcard"><h3>'+t.name+'</h3><div class="form">'+t.form+'</div>'
+      +'<div class="cue">合図: '+t.cue+'</div><div class="core">'+t.core+'</div>'
+      +'<div class="ng">✗ よくある間違い: '+t.ng+'</div>'
+      +'<div class="exlist">'+ex+'</div></div>';
+  }).join("");
+  document.getElementById("chartbody").innerHTML=flow+cards;
+}
+function resetAll(){
+  if(confirm("言えた記録と定着記録を全部消す？")){said={};need={};save();goHome();}
+}
+</script>
+<script>
+// ===== 覚えるモード: 日本語を見て英語で言う → 答え合わせ → 言えた/言えなかった =====
+function startLearn(t){
+  lastMode={kind:"learn",t};
+  queue=shuffle(sentsOf(t).map(s=>s.id));
+  total=queue.length;okCount=0;
+  showL();show("scr-learn");
+}
+function showL(){
+  if(!queue.length){showResult("learn");return;}
+  revealed=false;
+  cur=byId[queue[0]];
+  document.getElementById("ldir").textContent=typeById[cur.t].name;
+  document.getElementById("lprog").textContent="残り "+queue.length+"文（言えた "+okCount+"/"+total+"）";
+  document.getElementById("ljp").textContent=cur.jp;
+  document.getElementById("len").innerHTML=markEn(cur);
+  document.getElementById("lwhy").textContent=cur.why;
+  document.getElementById("lencard").className="encard";
+  document.getElementById("ljudge").className="judge";
+  document.getElementById("lreveal").style.display="block";
+  window.scrollTo(0,0);
+}
+function reveal(){
+  if(revealed)return;revealed=true;
+  document.getElementById("lencard").className="encard on";
+  document.getElementById("ljudge").className="judge on";
+  document.getElementById("lreveal").style.display="none";
+  speak(document.getElementById("len").textContent);
+}
+function judge(ok){
+  if(!revealed)return;
+  if(ok){said[cur.id]=1;okCount++;queue.shift();}
+  else{
+    said[cur.id]=0;
+    need[cur.id]=3;                                  // 4択側の定着ループに送る
+    queue.shift();queue.splice(Math.min(3,queue.length),0,cur.id);  // 数文後にもう一度出す
+  }
+  save();showL();
+}
+</script>
+<script>
+// ===== 4択モード: 空所に入る形を選ぶ。間違えたら3回連続正解するまで残る =====
+function startQuiz(t){
+  lastMode={kind:"quiz",t};
+  let ids;
+  if(t==="need"){ids=KSENTS.filter(s=>need[s.id]>0).map(s=>s.id);if(!ids.length)return;}
+  else ids=sentsOf(t).map(s=>s.id);
+  queue=shuffle(ids);total=queue.length;okCount=0;
+  showQ();show("scr-quiz");
+}
+function showQ(){
+  if(!queue.length){showResult("quiz");return;}
+  answered=false;
+  cur=byId[queue[0]];
+  document.getElementById("qdir").textContent=typeById[cur.t].name;
+  document.getElementById("qprog").textContent="残り "+queue.length+"問（正解 "+okCount+"/"+total+"）";
+  document.getElementById("qjp").textContent=cur.jp;
+  document.getElementById("qen").innerHTML=blankEn(cur);
+  const opts=shuffle(cur.o.slice());
+  document.getElementById("qopts").innerHTML=opts.map(o=>
+    '<div class="opt" data-v="'+esc(o).replace(/"/g,"&quot;")+'" onclick="answer(this)">'+esc(o)+'</div>').join("");
+  document.getElementById("qexp").className="exp";
+  document.getElementById("nextbtn").className="nextbtn";
+  window.scrollTo(0,0);
+}
+function answer(el){
+  if(answered)return;answered=true;
+  const correct=cur.blank,ok=el.dataset.v===correct;
+  document.querySelectorAll(".opt").forEach(o=>{
+    o.classList.add("disabled");o.onclick=null;
+    if(o.dataset.v===correct)o.classList.add("correct");
+    else if(o===el)o.classList.add("wrong");
+  });
+  let loop="";
+  if(ok){
+    if(need[cur.id]>0){
+      need[cur.id]--;
+      if(need[cur.id]<=0){delete need[cur.id];loop="🎉 3回連続正解＝定着した";queue.shift();okCount++;}
+      else{loop="あと"+need[cur.id]+"回連続で正解すると定着";
+        queue.shift();queue.splice(Math.min(3,queue.length),0,cur.id);}
+    }else{queue.shift();okCount++;}
+  }else{
+    need[cur.id]=3;loop="3回連続で正解すると定着（間違えたのでリセット）";
+    queue.shift();queue.splice(Math.min(3,queue.length),0,cur.id);
+  }
+  save();
+  const t=typeById[cur.t];
+  document.getElementById("qexp").innerHTML='<div class="verdict '+(ok?"ok":"ng")+'">'+(ok?"⭕ 正解":"❌ 不正解")+'</div>'
+    +'<div class="full">'+markEn(cur)+'</div>'
+    +'<div class="cue">この文は「<b>'+t.name+'</b>」の型。'+(cur.cue?'合図は <b>'+esc(cur.cue)+'</b>。':'')+'</div>'
+    +'<div>'+esc(cur.why)+'</div>'
+    +(loop?'<div class="loop">🔁 '+loop+'</div>':"");
+  document.getElementById("qexp").className="exp on";
+  document.getElementById("nextbtn").className="nextbtn on";
+}
+function nextQ(){showQ()}
+</script>
+<script>
+function showResult(kind){
+  const ex=document.getElementById("rextra");
+  if(kind==="learn"){
+    document.getElementById("rtitle").textContent=okCount+" / "+total;
+    const nd=KSENTS.filter(s=>need[s.id]>0).length;
+    document.getElementById("rmsg").textContent=okCount===total
+      ? "全部言えた。4択で確認すると定着がはっきりする。"
+      : "言えなかった文は定着待ちに入れた（全体で"+nd+"文）。4択で3回連続正解すると消える。";
+    ex.style.display="block";
+    ex.textContent="✏️ この型を4択で試す";
+    ex.onclick=()=>startQuiz(lastMode.t);
+  }else{
+    document.getElementById("rtitle").textContent=okCount+" / "+total;
+    const nd=KSENTS.filter(s=>need[s.id]>0).length;
+    document.getElementById("rmsg").textContent=nd
+      ? "全体で定着待ちが"+nd+"文ある（🔁から再挑戦）。"
+      : "🎉 定着待ちゼロ。";
+    ex.style.display="block";
+    ex.textContent="📖 この型を声に出して覚える";
+    ex.onclick=()=>startLearn(lastMode.t==="need"?null:lastMode.t);
+  }
+  show("scr-result");
+}
+function retry(){
+  if(!lastMode)return goHome();
+  lastMode.kind==="learn"?startLearn(lastMode.t):startQuiz(lastMode.t);
+}
+renderHome();
+renderChart();
+</script>
+</body>
+</html>
