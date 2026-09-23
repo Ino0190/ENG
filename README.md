@@ -81,11 +81,27 @@ node _check.js
 単元数・問題数・選択肢の数・正解の位置・空所が1箇所か・例文に語形が含まれるか・
 型ごとの文数（基本5文と追加3文）・暗唱の代表文が型ごと1本かを、まとめて検査する。
 
-アップロードするファイルは9つ。
+アップロードするファイルは10個。
 
 ```
 index.html  kanryo.html  kanryo.js  saigakushu.html  saigakushu.js
-bunpo.html  tango.html  words.js  questions.js
+bunpo.html  tango.html  words.js  questions.js  ver.js
 ```
 
 `_check.js` は検証用なので上げなくてよい。
+
+### 版の確認とキャッシュ
+
+全ページの右上に**版**が出る（`ver.js` の `APP_VER` が正本。直したらここを上げる）。
+
+**うまくいかないときは、まず両方の端末で版を見比べる。**
+違っていたら、古い方がまだ届いていないかキャッシュが残っている。
+
+- **版が出ない** → 古いファイル。版表示は新しい版にしか入っていない
+- **上げたのに変わらない** → キャッシュ。URLの末尾に `?v=3` のようなクエリを付けて開くと、必ず取り直される
+
+```
+https://ino0190.github.io/ENG_Drill/saigakushu.html?v=3
+```
+
+スマホでホーム画面に追加している場合は、いったん削除して追加し直すと確実。

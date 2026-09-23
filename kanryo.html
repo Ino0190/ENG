@@ -55,7 +55,10 @@ p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
 .judge button{flex:1;border-radius:12px;padding:15px 8px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;border:2px solid}
 .judge .said{background:rgba(46,204,113,.12);border-color:var(--ok);color:var(--ok)}
 .judge .nosaid{background:rgba(231,76,60,.12);border-color:var(--ng);color:var(--ng)}
+.appverline{font-size:12px;color:var(--sub);margin-top:6px;text-align:right;opacity:.85}
+.appverline .appver{font-weight:700}
 </style>
+<script src="ver.js"></script>
 </head>
 <style>
 /* 4択モード */
@@ -107,6 +110,7 @@ p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
 <header>
   <div class="htitle">⏳ 現在完了</div>
   <nav class="hnav"><a href="index.html">▶ 診断</a><a href="saigakushu.html">🧱 再学習</a><a href="bunpo.html">📖 解説</a></nav>
+  <div class="appverline">版 <span class="appver">読み込み中</span></div>
 </header>
 
 <div class="screen on" id="scr-home">

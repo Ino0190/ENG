@@ -112,6 +112,9 @@ p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
 /* AIに頼む */
 .promptBtn{width:100%;margin-top:12px;background:var(--card);border:1px solid var(--blue);color:var(--blue);border-radius:10px;padding:11px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
 .promptHint{font-size:13px;color:var(--sub);margin-top:6px;line-height:1.7}
+.appverline{font-size:12px;color:var(--sub);margin-top:6px;text-align:right;opacity:.85}
+.appverline .appver{font-weight:700}
+.verline{background:var(--card2);border:1px solid var(--blue);border-radius:10px;padding:10px 13px;font-size:14px;font-weight:700;color:var(--blue);margin-bottom:6px}
 .jta{width:100%;min-height:96px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:11px;font-size:14px;line-height:1.6;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical;margin:8px 0}
 .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--card2);border:1px solid var(--blue);color:var(--text);border-radius:10px;padding:12px 18px;font-size:15px;font-weight:700;opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:92%;text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -126,6 +129,7 @@ p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
   <div class="htitle">🧱 再学習</div>
   <nav class="hnav"><a href="index.html">▶ 診断</a><a href="kanryo.html">⏳ 完了形</a><a href="bunpo.html">📖 解説</a></nav>
 </header>
+<div class="appverline">版 <span class="appver">読み込み中</span></div>
 
 <div class="screen on" id="scr-home">
   <h1>現在完了の次から高校まで</h1>
@@ -193,6 +197,8 @@ p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
   <button class="homebtn" onclick="goHome()">← 型の一覧</button>
   <h1>ふっかつのじゅもん</h1>
   <p class="lead">パソコンとスマホで進捗を持ち運ぶ。<b>4つのページぜんぶ（診断・完了形・再学習・単語）</b>の記録をまとめて1つの文字列にする。サーバーには何も送らない。</p>
+  <div class="verline" id="jVer"></div>
+  <div class="promptHint">うまくいかないときは、両方の端末でこの「版」を見比べる。<b>違っていたら、古い方のファイルを上げ直す（またはページを強制リロードする）</b>のが先。</div>
 
   <div class="flow">
     <h3>① いまの状態を出す</h3>
@@ -225,6 +231,7 @@ p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
 
 <div class="toast" id="toast"></div>
 
+<script src="ver.js"></script>
 <script src="saigakushu.js"></script>
 <script>
 // 記録: said=覚えるモードで言えたか / need=定着ループ（4択で間違えたら3回連続正解まで残る）
@@ -432,6 +439,9 @@ const JUMON_PREFIX="ENGv2:";
 const JUMON_OLD="ENGv1:";
 // 終端記号。メールの署名や「以上」などが後ろに付いてもここで切れる（: は base64 に出てこない）
 const JUMON_END=":END";
+// 版は ver.js の APP_VER が正本（全ページ共通）
+// file:// で開いているときは自分のURLが使えないので、公開URLを使ってリンクを作る
+const PAGES_URL="https://ino0190.github.io/ENG_Drill/saigakushu.html";
 const KANRYO_KEY="kanryo_v1";
 const DIAG_KEY="engdrill_v1";      // 診断（index.html）
 const TANGO_NEED="tango_need_v1";  // 単語の定着待ち
@@ -479,6 +489,10 @@ function openJumon(){
   ];
   document.getElementById("jOutInfo").innerHTML=
     rows.map(r=>"・"+esc(r)).join("<br>")+"<br>（文字数 "+code.length+"）";
+  // 両方の端末でここを見比べれば、古いファイルを見ているかどうかが分かる
+  document.getElementById("jVer").textContent=
+    "このページの版: "+(typeof APP_VER!=="undefined"?APP_VER:"不明（ver.jsが読めていない）")
+    +" ／ 開き方: "+(location.protocol==="file:"?"ファイルを直接":location.host);
   show("scr-jumon");
 }
 function copyJumon(){
@@ -489,15 +503,15 @@ function toUrlSafe(b64){return b64.replace(/\+/g,"-").replace(/\//g,"_").replace
 function jumonLink(){
   const full=packJumon();
   const b64=full.slice(JUMON_PREFIX.length,full.length-JUMON_END.length);
-  return location.origin+location.pathname+"#j="+toUrlSafe(b64)+JUMON_END;
+  // file:// のときは自分のURLを渡しても相手が開けないので、公開URLに載せる
+  const base=(location.protocol==="http:"||location.protocol==="https:")
+    ? location.origin+location.pathname : PAGES_URL;
+  return base+"#j="+toUrlSafe(b64)+JUMON_END;
 }
 function copyJumonLink(){
   const url=jumonLink();
-  if(location.protocol==="file:"){
-    showToast("いまはファイルを直接開いているのでリンクは使えません。公開URLで開いてから");
-    return;
-  }
-  copyText(url,"🔗 リンクをコピーした（"+url.length+"文字）。スマホで開くだけで戻る");
+  const note=location.protocol==="file:"?"（公開URLあてのリンクにしました）":"";
+  copyText(url,"🔗 リンクをコピーした"+note+"。スマホで開くだけで戻る");
 }
 
 // 貼り付けられた文字列を何とかして読む。
@@ -529,6 +543,16 @@ function decodePack(input){
   if(!pack||!pack.sg)return {err:"このアプリのじゅもんではありません"};
   return {pack:pack};
 }
+// じゅもんに入っている記録の総数。0なら「復元した」と言わずに理由を出す
+function packCount(p){
+  if(!p)return 0;
+  const sg=p.sg||{},kn=p.kn||{},dg=p.dg||{},tg=p.tg||{};
+  return (sg.s||[]).length+Object.keys(sg.n||{}).length
+    +Object.keys(sg.m||{}).length+Object.keys(sg.a||{}).length
+    +(kn.s||[]).length+Object.keys(kn.n||{}).length
+    +Object.keys(dg.o||{}).length+Object.keys(dg.x||{}).length
+    +(tg.f1||[]).length+(tg.f0||[]).length+Object.keys(tg.n||{}).length;
+}
 // 貼った時点で読めたかどうかを出す（ボタンを押す前に分かるように）
 function checkJumonInput(){
   const el=document.getElementById("jInStat");
@@ -542,6 +566,11 @@ function checkJumonInput(){
   if(p.kn)n.push("完了形 "+((p.kn.s||[]).length)+"文");
   if(p.dg)n.push("診断 "+(Object.keys(p.dg.o||{}).length+Object.keys(p.dg.x||{}).length)+"問");
   if(p.tg)n.push("単語 "+((p.tg.f1||[]).length+(p.tg.f0||[]).length)+"語");
+  if(packCount(p)===0){
+    el.style.color="var(--ng)";
+    el.textContent="✕ 読めたけれど中身が空です。出した側の進捗を確かめてください";
+    return;
+  }
   el.style.color="var(--ok)";
   el.textContent="◯ 読めました（"+n.join(" / ")+"）→ 下のボタンを押す";
 }
@@ -561,6 +590,11 @@ function applyJumon(src){
   const r=decodePack(raw);
   if(r.err){showToast(r.err);return;}
   const pack=r.pack;
+  // 中身が空のじゅもんを「復元した」と言うと原因が分からなくなるので先に弾く
+  if(!packCount(pack)){
+    showToast("このじゅもんには記録が入っていません。出した側の進捗を確かめてください");
+    return;
+  }
   const done=[];
 
   // 再学習

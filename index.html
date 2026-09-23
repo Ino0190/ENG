@@ -102,7 +102,10 @@ header{position:sticky;top:0;z-index:10;background:rgba(15,20,32,.95);backdrop-f
 /* トースト */
 #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--card2);border:1px solid var(--accent);color:var(--text);border-radius:10px;padding:12px 18px;font-size:15px;max-width:90%;opacity:0;pointer-events:none;transition:opacity .25s;z-index:50}
 #toast.on{opacity:1}
+.appverline{font-size:12px;color:var(--sub);margin-top:6px;text-align:right;opacity:.85}
+.appverline .appver{font-weight:700}
 </style>
+<script src="ver.js"></script>
 </head>
 <body>
 <header>
@@ -112,6 +115,7 @@ header{position:sticky;top:0;z-index:10;background:rgba(15,20,32,.95);backdrop-f
   </div>
   <div class="bar"><i id="hbar"></i></div>
   <nav class="hnav"><a href="kanryo.html">⏳ 完了形</a><a href="saigakushu.html">🧱 再学習</a><a href="bunpo.html">📖 解説</a><a href="tango.html">🎴 単語</a><a href="saigakushu.html#jumon">📜 じゅもん</a></nav>
+  <div class="appverline">版 <span class="appver">読み込み中</span></div>
 </header>
 
 <div class="screen home on" id="scr-home">
