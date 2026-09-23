@@ -198,15 +198,18 @@ p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
     <h3>① いまの状態を出す</h3>
     <p class="promptHint" id="jOutInfo"></p>
     <textarea id="jOut" class="jta" readonly placeholder="下のボタンで じゅもん を出す"></textarea>
-    <button class="promptBtn" onclick="copyJumon()">📜 じゅもんをコピーする</button>
-    <div class="promptHint">コピーしてスマホへ送る（自分宛てのメール・メモアプリ・LINEのKeepなど）。スマホでこのページを開いて、下の②に貼り付ける。</div>
+    <button class="promptBtn" onclick="copyJumonLink()">🔗 復元リンクをコピーする（おすすめ）</button>
+    <div class="promptHint"><b>これが一番確実。</b>リンクを自分宛てに送って、スマホでそのリンクを開くだけで戻る。貼り付ける操作が要らないので、改行が混ざって失敗することがない。</div>
+    <button class="promptBtn" onclick="copyJumon()">📜 じゅもんの文字列をコピーする</button>
+    <div class="promptHint">リンクが使えないときはこちら。スマホでこのページを開いて、下の②に貼り付ける。</div>
   </div>
 
   <div class="flow">
     <h3>② 別の端末で入れる</h3>
-    <textarea id="jIn" class="jta" placeholder="ここに じゅもん を貼り付ける"></textarea>
-    <button class="promptBtn" onclick="applyJumon()">✨ この じゅもん で復元する</button>
-    <div class="promptHint">いまの記録は消えません。進んでいる方を残す形で合わせます（言えた・覚えた・間違えた回数は多い方を採用）。</div>
+    <textarea id="jIn" class="jta" placeholder="ここに じゅもん か 復元リンク を貼り付ける" oninput="checkJumonInput()"></textarea>
+    <div class="promptHint" id="jInStat"></div>
+    <button class="promptBtn" onclick="applyJumon()">✨ これで復元する</button>
+    <div class="promptHint">じゅもんでもリンクでも貼れます。改行や全角が混ざっても読みます。いまの記録は消えません（進んでいる方を残します）。</div>
   </div>
 </div>
 
@@ -427,6 +430,8 @@ function copyPromptMiss(){
 // このページ(saigaku_v1)と完了形(kanryo_v1)の記録をまとめて1つの文字列にする。外部へは送らない。
 const JUMON_PREFIX="ENGv2:";
 const JUMON_OLD="ENGv1:";
+// 終端記号。メールの署名や「以上」などが後ろに付いてもここで切れる（: は base64 に出てこない）
+const JUMON_END=":END";
 const KANRYO_KEY="kanryo_v1";
 const DIAG_KEY="engdrill_v1";      // 診断（index.html）
 const TANGO_NEED="tango_need_v1";  // 単語の定着待ち
@@ -460,7 +465,7 @@ function packJumon(){
         f0:Object.keys(tf).filter(w=>Number(tf[w])===0),
         n:nz(lsGet(TANGO_NEED))}
   };
-  return JUMON_PREFIX+b64enc(JSON.stringify(pack));
+  return JUMON_PREFIX+b64enc(JSON.stringify(pack))+JUMON_END;
 }
 function openJumon(){
   const code=packJumon();
@@ -479,6 +484,67 @@ function openJumon(){
 function copyJumon(){
   copyText(document.getElementById("jOut").value,"📜 じゅもんをコピーした。スマホへ送って②に貼る");
 }
+// URLに載せる用（+ / = を URL で安全な文字に置き換える）
+function toUrlSafe(b64){return b64.replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
+function jumonLink(){
+  const full=packJumon();
+  const b64=full.slice(JUMON_PREFIX.length,full.length-JUMON_END.length);
+  return location.origin+location.pathname+"#j="+toUrlSafe(b64)+JUMON_END;
+}
+function copyJumonLink(){
+  const url=jumonLink();
+  if(location.protocol==="file:"){
+    showToast("いまはファイルを直接開いているのでリンクは使えません。公開URLで開いてから");
+    return;
+  }
+  copyText(url,"🔗 リンクをコピーした（"+url.length+"文字）。スマホで開くだけで戻る");
+}
+
+// 貼り付けられた文字列を何とかして読む。
+// 改行・全角・見えない文字・URL・接頭辞の有無を全部吸収する
+function cleanCode(s){
+  s=String(s||"");
+  const i=s.indexOf("#j=");
+  if(i>=0)s=s.slice(i+3);
+  s=s.replace(/[\uFF01-\uFF5E]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)); // 全角→半角
+  s=s.replace(/[\s\u200B-\u200D\uFEFF\u00A0]/g,"");                               // 空白・改行・見えない文字
+  const ps=[JUMON_PREFIX,JUMON_OLD];
+  for(let i=0;i<ps.length;i++){const k=s.indexOf(ps[i]);if(k>=0){s=s.slice(k+ps[i].length);break}}
+  const e=s.indexOf(JUMON_END);
+  if(e>=0)s=s.slice(0,e);   // 終端記号があればここで確実に切る
+  // 終端記号が無い古いじゅもん向け。base64に使える文字のかたまりで一番長いものを採る
+  const runs=s.match(/[A-Za-z0-9+/=_-]+/g);
+  if(runs)s=runs.reduce((a,b)=>b.length>a.length?b:a,"");
+  return s;
+}
+function decodePack(input){
+  let s=cleanCode(input);
+  if(!s)return {err:"空です。じゅもんを貼り付けてください"};
+  s=s.replace(/-/g,"+").replace(/_/g,"/");
+  while(s.length%4)s+="=";
+  let json;
+  try{json=b64dec(s)}catch(e){return {err:"文字が壊れています（"+s.length+"文字）。全部コピーできているか確認してください"}}
+  let pack;
+  try{pack=JSON.parse(json)}catch(e){return {err:"途中で切れています（"+s.length+"文字）。最後まで選んでコピーしてください"}}
+  if(!pack||!pack.sg)return {err:"このアプリのじゅもんではありません"};
+  return {pack:pack};
+}
+// 貼った時点で読めたかどうかを出す（ボタンを押す前に分かるように）
+function checkJumonInput(){
+  const el=document.getElementById("jInStat");
+  const raw=document.getElementById("jIn").value;
+  if(!String(raw).trim()){el.textContent="";return;}
+  const r=decodePack(raw);
+  if(r.err){el.style.color="var(--ng)";el.textContent="✕ "+r.err;return;}
+  const p=r.pack;
+  const n=[];
+  if(p.sg)n.push("再学習 言えた"+((p.sg.s||[]).length)+"文");
+  if(p.kn)n.push("完了形 "+((p.kn.s||[]).length)+"文");
+  if(p.dg)n.push("診断 "+(Object.keys(p.dg.o||{}).length+Object.keys(p.dg.x||{}).length)+"問");
+  if(p.tg)n.push("単語 "+((p.tg.f1||[]).length+(p.tg.f0||[]).length)+"語");
+  el.style.color="var(--ok)";
+  el.textContent="◯ 読めました（"+n.join(" / ")+"）→ 下のボタンを押す";
+}
 // 数の記録は「多い方」を残す。いまの記録を消さない
 function mergeMax(dst,src){
   Object.keys(src||{}).forEach(k=>{
@@ -490,15 +556,11 @@ function mergeMax(dst,src){
 function mergeOk(dst,ids){(ids||[]).forEach(id=>{dst[id]=1})}
 // 自分に記録が無いものだけ入れる（診断の回答と単語の初見は上書きしない）
 function fillMissing(dst,ids,val){(ids||[]).forEach(k=>{if(!(k in dst))dst[k]=val})}
-function applyJumon(){
-  const raw=(document.getElementById("jIn").value||"").trim();
-  if(!raw){showToast("じゅもんが空です");return;}
-  const pre=raw.indexOf(JUMON_PREFIX)===0?JUMON_PREFIX:(raw.indexOf(JUMON_OLD)===0?JUMON_OLD:null);
-  if(!pre){showToast("このページのじゅもんではありません（"+JUMON_PREFIX+"で始まる）");return;}
-  let pack;
-  try{pack=JSON.parse(b64dec(raw.slice(pre.length)));}
-  catch(e){showToast("じゅもんが壊れています。途中で切れていないか確認してください");return;}
-  if(!pack||!pack.sg){showToast("じゅもんの中身が読めません");return;}
+function applyJumon(src){
+  const raw=src!=null?src:document.getElementById("jIn").value;
+  const r=decodePack(raw);
+  if(r.err){showToast(r.err);return;}
+  const pack=r.pack;
   const done=[];
 
   // 再学習
@@ -704,7 +766,16 @@ renderHome();
 renderChart();
 // 他のページから saigakushu.html#jumon で直接開けるようにする。
 // 同じページ内でハッシュだけ変わったときは読み込みが起きないので、変化も拾う
-function openByHash(){if(location.hash==="#jumon")openJumon()}
+function openByHash(){
+  const h=location.hash||"";
+  if(h==="#jumon"){openJumon();return;}
+  // #j=... の復元リンクで開かれた場合は、そのまま復元する（貼り付け操作が要らない）
+  if(h.indexOf("#j=")===0){
+    const code=h.slice(3);
+    if(history.replaceState)history.replaceState(null,"",location.pathname); // URLに記録を残さない
+    applyJumon(code);   // 復元して、そのままホームに戻る（結果はトーストに出る）
+  }
+}
 window.addEventListener("hashchange",openByHash);
 openByHash();
 </script>
