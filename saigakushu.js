@@ -8,6 +8,8 @@
 // o[0] が必ず正解。表示時にシャッフルする。
 
 const SSTAGES=[
+  {id:"s0",name:"動詞のうしろに来る形（診断の起点）",
+   lead:"「テニスをすること」が enjoy のうしろでは playing、want のうしろでは to play になる。決めているのはうしろの動詞ではなく前の動詞。ここが後の全部の土台になるので最初にやる。"},
   {id:"s1",name:"うしろから飾る",
    lead:"日本語は「立っている男性」と前から飾るが、英語は名詞のうしろに置く。ここが分かると関係代名詞まで一気に繋がる。"},
   {id:"s2",name:"つなぎを増やす",
@@ -19,6 +21,17 @@ const SSTAGES=[
 ];
 
 const STYPES=[
+  // ===== ステージ0（診断の起点。中2の範囲だが、ここが後の全部の土台）=====
+  {id:"v-ing",s:"s0",name:"もう手をつけていること（うしろは ing）",form:"動詞 + ing",cue:"enjoy / finish / keep / mind",
+   core:"enjoy・finish・keep・practice・avoid のうしろは ing。楽しむにも終えるにも、先にやっている必要がある。だから「もう手をつけた形」の ing。",
+   ng:"enjoyed to play（これから遊ぶことを楽しんだ、では話が合わない）"},
+  {id:"v-to",s:"s0",name:"これからのこと（うしろは to）",form:"動詞 + to + 動詞",cue:"want / decide / promise / need",
+   core:"want・decide・hope・promise・need のうしろは to。どれもまだやっていないことを言う動詞。だから「これからの形」の to。",
+   ng:"want playing（まだやっていないので ing にはならない）"},
+  {id:"prep-to",s:"s0",name:"to の前に単語がくっついている（うしろは ing）",form:"前置詞 + ing",cue:"forward to / used to / good at / without",
+   core:"to が単独なら「これから」の to でうしろは動詞そのまま。to の前に単語がくっついていたら（look forward to・be used to）、その to は in や at と同じ仲間で、うしろは「もの」＝ing。",
+   ng:"looking forward to see（楽しみ＝これからだと思って to + 動詞にしてしまう）"},
+
   // ===== ステージ1 =====
   {id:"ing-mod",s:"s1",name:"している方（うしろから飾る）",form:"名詞 + ing",cue:"文にもう動詞がある",
    core:"「向こうに立っている男性」は英語では「男性 → 立っている」の順。文の動詞は別にあるので、飾る側は ing だけを置く。",
@@ -68,6 +81,91 @@ const STYPES=[
 ];
 
 const SSENTS=[
+  // ===== v-ing: もう手をつけていること（ステージ0・診断の起点） =====
+  {id:201,t:"v-ing",jp:"彼はテニスをすることを楽しんだ。",en:"He enjoyed playing tennis.",
+   blank:"playing",o:["playing","to play","play","played"],cue:"enjoyed",
+   why:"enjoy は「やってみて楽しかった」。先にやっている必要があるので、もう手をつけた形の ing。"},
+  {id:202,t:"v-ing",key:1,swap:["I finished checking the data.","We finished testing it yesterday."],
+   jp:"報告書を書き終えた。",en:"I finished writing the report.",
+   blank:"writing",o:["writing","to write","write","written"],cue:"finished",
+   why:"finish は「やったから終わる」。終えるには先にやっている必要があるので ing。"},
+  {id:203,t:"v-ing",jp:"彼は質問を続けた。",en:"He kept asking questions.",
+   blank:"asking",o:["asking","to ask","ask","asked"],cue:"kept",
+   why:"keep は「やっていることを続ける」。もうやっているので ing。"},
+  {id:204,t:"v-ing",jp:"毎日英語を話す練習をしている。",en:"I practice speaking English every day.",
+   blank:"speaking",o:["speaking","to speak","speak","spoken"],cue:"every day",
+   why:"practice は実際にやることなので ing。to speak にはならない。"},
+  {id:205,t:"v-ing",jp:"待つのは気にしません。",en:"I do not mind waiting.",
+   blank:"waiting",o:["waiting","to wait","wait","waited"],cue:"do not mind",
+   why:"mind のうしろは ing に決まっている。意味から考えるより、この動詞はこの形、と覚える方が速い。"},
+
+  // ===== v-to: これからのこと =====
+  {id:211,t:"v-to",jp:"私はテニスをしたい。",en:"I want to play tennis.",
+   blank:"to play",o:["to play","playing","play","played"],cue:"want",
+   why:"want は「まだしていないことを望む」。これからの形なので to。"},
+  {id:212,t:"v-to",jp:"彼は行くことに決めた。",en:"He decided to go.",
+   blank:"to go",o:["to go","going","go","gone"],cue:"decided",
+   why:"decide は「これからやると決める」。まだやっていないので to。"},
+  {id:213,t:"v-to",jp:"手伝うと約束した。",en:"I promised to help.",
+   blank:"to help",o:["to help","helping","help","helped"],cue:"promised",
+   why:"promise も「これからやる」話。約束した時点ではまだやっていない。"},
+  {id:214,t:"v-to",jp:"早く終わることを望んでいる。",en:"I hope to finish early.",
+   blank:"to finish",o:["to finish","finishing","finish","finished"],cue:"hope",
+   why:"hope は「これからそうなってほしい」。まだ起きていないので to。"},
+  {id:215,t:"v-to",key:1,swap:["I need to ask him first.","We need to check it before sending."],
+   jp:"確認する必要がある。",en:"I need to check it.",
+   blank:"to check",o:["to check","checking","check","checked"],cue:"need",
+   why:"need は「これからする必要がある」。まだしていないので to。"},
+
+  // ===== prep-to: to の前に単語がくっついている =====
+  {id:221,t:"prep-to",key:1,swap:["I am looking forward to hearing from you.","I am used to working from home."],
+   jp:"彼女に会うのを楽しみにしている。",en:"I am looking forward to seeing her.",
+   blank:"seeing",o:["seeing","to see","see","seen"],cue:"looking forward to",
+   why:"to の前に forward がくっついている。この to は in や at と同じ仲間なので、うしろは「もの」＝ing。"},
+  {id:222,t:"prep-to",jp:"早起きに慣れている。",en:"I am used to getting up early.",
+   blank:"getting",o:["getting","to get","get","got"],cue:"used to",
+   why:"used に to がくっついている形なので ing。前に be があるかどうかで見分ける。"},
+  {id:223,t:"prep-to",jp:"彼は説明するのが得意だ。",en:"He is good at explaining.",
+   blank:"explaining",o:["explaining","to explain","explain","explained"],cue:"good at",
+   why:"at のうしろなので ing。to でなくても同じ仲間だと分かる例。"},
+  {id:224,t:"prep-to",jp:"遅れたことを謝った。",en:"I apologized for being late.",
+   blank:"being",o:["being","to be","be","been"],cue:"apologized for",
+   why:"for のうしろなので ing。be動詞も being になる。"},
+  {id:225,t:"prep-to",jp:"手伝ってくれてありがとう。",en:"Thank you for helping me.",
+   blank:"helping",o:["helping","to help","help","helped"],cue:"Thank you for",
+   why:"for のうしろなので ing。仕事のメールでそのまま使える形。"},
+
+  // ===== ステージ0の追加の文（lv:2） =====
+  {id:206,t:"v-ing",lv:2,jp:"彼は探すのをあきらめた。",en:"He gave up looking for it.",
+   blank:"looking",o:["looking","to look","look","looked"],cue:"gave up",
+   why:"give up は「やっていたことをやめる」。もうやっているので ing。"},
+  {id:207,t:"v-ing",lv:2,jp:"彼は会議に出るのを避けた。",en:"He avoided attending the meeting.",
+   blank:"attending",o:["attending","to attend","attend","attended"],cue:"avoided",
+   why:"avoid のうしろは ing に決まっている。"},
+  {id:208,t:"v-ing",lv:2,jp:"もう一度やってみることを提案した。",en:"I suggested trying it again.",
+   blank:"trying",o:["trying","to try","try","tried"],cue:"suggested",
+   why:"suggest のうしろは ing。to try としないのがここの落とし穴。"},
+
+  {id:216,t:"v-to",lv:2,jp:"来週会う計画を立てた。",en:"We planned to meet next week.",
+   blank:"to meet",o:["to meet","meeting","meet","met"],cue:"next week",
+   why:"plan は「これからやる」話なので to。"},
+  {id:217,t:"v-to",lv:2,jp:"彼は手伝うことに同意した。",en:"He agreed to help us.",
+   blank:"to help",o:["to help","helping","help","helped"],cue:"agreed",
+   why:"agree も「これからやる」話。同意した時点ではまだやっていない。"},
+  {id:218,t:"v-to",lv:2,jp:"彼女は説明しようと申し出た。",en:"She offered to explain it.",
+   blank:"to explain",o:["to explain","explaining","explain","explained"],cue:"offered",
+   why:"offer は「これからやりますと言う」。まだやっていないので to。"},
+
+  {id:226,t:"prep-to",lv:2,jp:"ファイルを送る前に確認した。",en:"I checked it before sending the file.",
+   blank:"sending",o:["sending","to send","send","sent"],cue:"before",
+   why:"before のうしろなので ing。to の話に限らず、前置詞のうしろは同じ。"},
+  {id:227,t:"prep-to",lv:2,jp:"彼は何も言わずに出て行った。",en:"He left without saying anything.",
+   blank:"saying",o:["saying","to say","say","said"],cue:"without",
+   why:"without のうしろなので ing。"},
+  {id:228,t:"prep-to",lv:2,jp:"参加することに興味がある。",en:"I am interested in joining.",
+   blank:"joining",o:["joining","to join","join","joined"],cue:"interested in",
+   why:"in のうしろなので ing。interested in ＋ ing はセットで覚えてよい。"},
+
   // ===== ing-mod: している方（うしろから飾る） =====
   {id:1,key:1,swap:["The woman sitting next to me is our client.","The people waiting outside are from the vendor."],t:"ing-mod",jp:"向こうに立っている男性は私の上司です。",en:"The man standing over there is my boss.",
    blank:"standing",o:["standing","is standing","stands","stood"],cue:"is my boss",

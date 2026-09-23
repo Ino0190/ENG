@@ -104,8 +104,12 @@ header{position:sticky;top:0;z-index:10;background:rgba(15,20,32,.95);backdrop-f
 #toast.on{opacity:1}
 .appverline{font-size:12px;color:var(--sub);margin-top:6px;text-align:right;opacity:.85}
 .appverline .appver{font-weight:700}
+.sprow{display:flex;gap:8px;margin-top:12px}
+.sprow .sbtn{flex:1;background:var(--card);border:1px solid var(--blue);color:var(--blue);border-radius:10px;padding:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+.speakbtn{background:none;border:1px solid var(--line);color:var(--sub);border-radius:8px;padding:5px 10px;font-size:14px;cursor:pointer;font-family:inherit;white-space:nowrap}
 </style>
 <script src="ver.js"></script>
+<script src="speak.js"></script>
 <script src="jumon.js"></script>
 </head>
 <body>
@@ -116,7 +120,7 @@ header{position:sticky;top:0;z-index:10;background:rgba(15,20,32,.95);backdrop-f
   </div>
   <div class="bar"><i id="hbar"></i></div>
   <nav class="hnav"><a href="kanryo.html">⏳ 完了形</a><a href="saigakushu.html">🧱 再学習</a><a href="bunpo.html">📖 解説</a><a href="tango.html">🎴 単語</a><a href="#" onclick="Jumon.open();return false">📜 じゅもん</a></nav>
-  <div class="appverline">版 <span class="appver">読み込み中</span></div>
+  <div class="appverline"><button class="speakbtn" onclick="Speak.openPanel()">🔊 読み上げ</button> 版 <span class="appver">読み込み中</span></div>
 </header>
 
 <div class="screen home on" id="scr-home">
@@ -184,6 +188,8 @@ const byId={};QUESTIONS.forEach(q=>byId[q.id]=q);
 const unitQs={};UNITS.forEach(u=>unitQs[u.id]=QUESTIONS.filter(q=>q.u===u.id));
 
 function load(){try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return null}}
+// jumon.js の保険。localStorage から読めなくても、いま画面が持っている記録を渡せるようにする
+window.__jumonMem=function(){return {engdrill_v1:JSON.stringify(state)}};
 function save(){localStorage.setItem(KEY,JSON.stringify(state))}
 
 function unitStatus(uid){
@@ -278,6 +284,7 @@ function showQ(){
   window.scrollTo(0,0);
 }
 function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function speak(text,opt){ if(window.Speak) Speak.say(text,opt); }
 let answered=false;
 function answer(i){
   if(answered)return;answered=true;
@@ -296,8 +303,11 @@ function answer(i){
     +'<div class="full">'+esc(full)+'</div>'
     +'<div class="h">決め手</div><div>'+esc(q.why)+'</div>'
     +'<div class="h">他の選択肢</div><div class="elim">'+esc(q.elim)+'</div>'
-    +'<a class="bunpolink" href="bunpo.html#'+q.u+'">📖 この単元の解説を読む</a>';
+    +'<a class="bunpolink" href="bunpo.html#'+q.u+'">📖 この単元の解説を読む</a>'
+    +'<div class="sprow">'+'<button class="sbtn" onclick="speak(window.__lastEn)">🔊 もう一度</button>'+'<button class="sbtn" onclick="speak(window.__lastEn,{slow:true})">🐢 ゆっくり</button>'+'</div>';
+  window.__lastEn=full;
   exp.className="exp on";
+  if(window.Speak)Speak.say(full);
   document.getElementById("nextbtn").className="nextbtn on";
   const answeredCnt=Object.keys(state.ans).length;
   document.getElementById("hstat").textContent="診断 "+answeredCnt+"/"+QUESTIONS.length;
