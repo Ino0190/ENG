@@ -192,7 +192,7 @@ p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
 <div class="screen" id="scr-jumon">
   <button class="homebtn" onclick="goHome()">← 型の一覧</button>
   <h1>ふっかつのじゅもん</h1>
-  <p class="lead">パソコンとスマホで進捗を持ち運ぶ。この画面の記録（再学習＋完了形）をまとめて文字列にする。サーバーには何も送らない。</p>
+  <p class="lead">パソコンとスマホで進捗を持ち運ぶ。<b>4つのページぜんぶ（診断・完了形・再学習・単語）</b>の記録をまとめて1つの文字列にする。サーバーには何も送らない。</p>
 
   <div class="flow">
     <h3>① いまの状態を出す</h3>
@@ -248,7 +248,11 @@ function missAdd(tid){
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a}
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
 function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));document.getElementById(id).classList.add("on");window.scrollTo(0,0)}
-function goHome(){renderHome();show("scr-home")}
+function goHome(){
+  // #jumon を残すと、次に同じリンクを押しても開かない・リロードでじゅもん画面に戻る
+  if(location.hash&&history.replaceState)history.replaceState(null,"",location.pathname);
+  renderHome();show("scr-home");
+}
 function sentsOf(t){
   if(!t)return SSENTS.filter(avail);
   if(t==="key")return keySents();                         // 暗唱セット（型ごと1本）
@@ -331,9 +335,7 @@ function renderHome(){
   // じゅもん
   const sc2=Object.keys(said).filter(k=>said[k]===1).length;
   document.getElementById("jumondesc").textContent=
-    sc2||anshoDone()||Object.keys(missT).length
-      ? "いまの進捗を文字列にしてスマホへ持っていく（完了形の記録も一緒に運ぶ）"
-      : "まだ記録がない。少し進めてから出すと意味がある";
+    "4つのページぜんぶ（診断・完了形・再学習・単語）の進捗を文字列にしてスマホへ持っていく";
   // いま出せる文の数をボタンに出す（解放が進むと増える）
   const total=sentsOf(null).length;
   document.getElementById("btn-all-learn").textContent="📖 覚える（"+total+"文）";
@@ -491,26 +493,47 @@ function fillMissing(dst,ids,val){(ids||[]).forEach(k=>{if(!(k in dst))dst[k]=va
 function applyJumon(){
   const raw=(document.getElementById("jIn").value||"").trim();
   if(!raw){showToast("じゅもんが空です");return;}
-  if(raw.indexOf(JUMON_PREFIX)!==0){showToast("このページのじゅもんではありません（"+JUMON_PREFIX+"で始まる）");return;}
+  const pre=raw.indexOf(JUMON_PREFIX)===0?JUMON_PREFIX:(raw.indexOf(JUMON_OLD)===0?JUMON_OLD:null);
+  if(!pre){showToast("このページのじゅもんではありません（"+JUMON_PREFIX+"で始まる）");return;}
   let pack;
-  try{pack=JSON.parse(atob(raw.slice(JUMON_PREFIX.length)));}
+  try{pack=JSON.parse(b64dec(raw.slice(pre.length)));}
   catch(e){showToast("じゅもんが壊れています。途中で切れていないか確認してください");return;}
   if(!pack||!pack.sg){showToast("じゅもんの中身が読めません");return;}
+  const done=[];
 
+  // 再学習
   mergeOk(said,pack.sg.s);mergeMax(need,pack.sg.n);
   mergeMax(missT,pack.sg.m);mergeMax(ansho,pack.sg.a);
   save();
+  done.push("再学習 言えた"+okIds(said).length+"文・暗唱"+anshoDone()+"文");
 
-  let knMsg="";
+  // 完了形
   if(pack.kn){
-    let kn={};try{kn=JSON.parse(localStorage.getItem(KANRYO_KEY))||{}}catch(e){kn={}}
+    const kn=lsGet(KANRYO_KEY);
     kn.said=kn.said||{};kn.need=kn.need||{};
     mergeOk(kn.said,pack.kn.s);mergeMax(kn.need,pack.kn.n);
     try{localStorage.setItem(KANRYO_KEY,JSON.stringify(kn));
-      knMsg="／完了形も "+Object.keys(kn.said).filter(k=>kn.said[k]===1).length+"文";}catch(e){}
+      done.push("完了形 言えた"+okIds(kn.said).length+"文");}catch(e){}
+  }
+  // 診断（回答は上書きせず、自分に無い問題だけ入れる）
+  if(pack.dg){
+    const dg=lsGet(DIAG_KEY);dg.ans=dg.ans||{};
+    Object.keys(pack.dg.o||{}).forEach(id=>{if(!dg.ans[id])dg.ans[id]={sel:Number(pack.dg.o[id]),ok:true}});
+    Object.keys(pack.dg.x||{}).forEach(id=>{if(!dg.ans[id])dg.ans[id]={sel:Number(pack.dg.x[id]),ok:false}});
+    try{localStorage.setItem(DIAG_KEY,JSON.stringify(dg));
+      done.push("診断 "+Object.keys(dg.ans).length+"問");}catch(e){}
+  }
+  // 単語（初見の正誤は上書きしない・定着待ちは多い方）
+  if(pack.tg){
+    const tf=lsGet(TANGO_FIRST);
+    fillMissing(tf,pack.tg.f1,1);fillMissing(tf,pack.tg.f0,0);
+    const tn=lsGet(TANGO_NEED);mergeMax(tn,pack.tg.n);
+    try{localStorage.setItem(TANGO_FIRST,JSON.stringify(tf));
+      localStorage.setItem(TANGO_NEED,JSON.stringify(tn));
+      done.push("単語 "+Object.keys(tf).length+"語");}catch(e){}
   }
   goHome();
-  showToast("✨ 復元した。言えた "+Object.keys(said).filter(k=>said[k]===1).length+"文 / 暗唱 "+anshoDone()+"文"+knMsg);
+  showToast("✨ 復元した。"+done.join(" / "));
 }
 
 function resetAll(){
@@ -679,6 +702,11 @@ function retry(){
 }
 renderHome();
 renderChart();
+// 他のページから saigakushu.html#jumon で直接開けるようにする。
+// 同じページ内でハッシュだけ変わったときは読み込みが起きないので、変化も拾う
+function openByHash(){if(location.hash==="#jumon")openJumon()}
+window.addEventListener("hashchange",openByHash);
+openByHash();
 </script>
 </body>
 </html>
