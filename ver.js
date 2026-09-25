@@ -5,7 +5,7 @@
 // PAGES_URL 公開URL。パソコンでファイルを直接開いているときは自分のURLが使えないので、
 //           復元リンクをこのURLで組み立てる。
 //           🔴 リポジトリ名を変えたらここを直す。直さないとリンクが404になる。
-const APP_VER = "v10 (2026-09-25)";
+const APP_VER = "v11 (2026-09-25)";
 const PAGES_BASE = "https://ino0190.github.io/ENG/";
 
 document.addEventListener("DOMContentLoaded", function () {

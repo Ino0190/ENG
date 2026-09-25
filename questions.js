@@ -23,19 +23,25 @@ const UNITS = [
   {id:"m3indq", g:"中3", name:"間接疑問文", desc:"語順を普通の文に戻す"},
   // 高校範囲は学習の順に並べる（この順序が「崩れの起点」の判定に使われる）
   {id:"h1tense",g:"高校", name:"過去完了・完了進行形", desc:"had done / have been 〜ing"},
+  {id:"h1fut2", g:"高校", name:"未来完了・時の慣用", desc:"will have done / by the time"},
   {id:"h1auxp", g:"高校", name:"助動詞+have+過去分詞", desc:"should have done"},
   {id:"h1pass2",g:"高校", name:"受動態の発展", desc:"be said to / 句動詞の受け身"},
   {id:"h1caus", g:"高校", name:"使役・知覚動詞", desc:"make/let/have + 原形 / see 〜 ing"},
   {id:"h1partc",g:"高校", name:"分詞構文", desc:"Walking in the park, ..."},
+  {id:"h1that", g:"高校", name:"形式目的語・同格のthat", desc:"make it clear that / the fact that"},
+  {id:"h1sothat",g:"高校",name:"目的・結果・程度", desc:"so that / such 〜 that / too 〜 to"},
   {id:"h1what", g:"高校", name:"関係代名詞what・複合関係詞", desc:"what / whatever / however"},
   {id:"h1rel2", g:"高校", name:"関係副詞・前置詞+関係代名詞", desc:"where / in which"},
   {id:"h1comp2",g:"高校", name:"比較の慣用", desc:"the 〜er the 〜er / not so much A as B"},
   {id:"h1subj", g:"高校", name:"仮定法", desc:"If I were / If I had done"},
   {id:"h1rep",  g:"高校", name:"話法と時制の一致", desc:"said that he would / told me to"},
+  {id:"h1neg",  g:"高校", name:"部分否定・否定の慣用", desc:"not all / cannot help 〜ing"},
   {id:"h1inv",  g:"高校", name:"倒置・否定の強調", desc:"Never have I / not only 〜 but also"},
   {id:"h1emph", g:"高校", name:"強調構文", desc:"It is 〜 that / do 強調"},
+  {id:"h1nonh", g:"高校", name:"無生物主語", desc:"The rain prevented us from 〜"},
   {id:"h1art",  g:"高校", name:"冠詞・可算不可算", desc:"a / the / information には s を付けない"},
   {id:"h1prep", g:"高校", name:"前置詞の使い分け", desc:"by/until, for/during, between/among"},
+  {id:"h1nomi", g:"高校", name:"名詞構文・群前置詞", desc:"on his arrival / with regard to"},
 ];
 const QUESTIONS = [
 // ===== 中1: be動詞と一般動詞 =====
@@ -170,6 +176,30 @@ const QUESTIONS = [
 {id:97,u:"h1prep",jp:"5時までにこれを終わらせて。",en:"Please finish this ___ five.",o:["by","until","till","in"],a:0,why:"by=期限（それまでに1回やる）、until=継続（それまでずっと）。finishは1回の動作なのでby。",elim:"B/C=until/tillだと「5時まで終わらせ続ける」になる。D=inは「5時間後に」の意味。"},
 {id:98,u:"h1prep",jp:"私は3日間そこに滞在した。",en:"I stayed there ___ three days.",o:["during","while","for","in"],a:2,why:"for+期間の長さ（three days）。duringは決まった期間の名前に付く（during the summer）。",elim:"A=duringの後ろは「夏休み」のような期間の名前。B=whileは接続詞で後ろに文が要る。D=inは「3日後に」。"},
 {id:99,u:"h1prep",jp:"その2つの間に違いはない。",en:"There is no difference ___ the two.",o:["among","between","in","of"],a:1,why:"between=2つの間、among=3つ以上。the twoなのでbetween。",elim:"A=amongは3つ以上。C=inは「中に」。D=ofでは2つの関係が表せない。"},
+// ===== 高校: 未来完了・時の慣用 =====
+{id:201,u:"h1fut2",jp:"来月でここに10年勤めたことになる。",en:"Next month I ___ here for ten years.",o:["work","will work","will have worked","have worked"],a:2,why:"未来のある時点までに続いている・終わっている話は will have+過去分詞。「来月で〜になる」が合図。",elim:"A=現在形は今の習慣。B=will workは「来月働く」だけ。D=have workedは今までの話で、未来の時点を含まない。"},
+{id:202,u:"h1fut2",jp:"彼が来る時までに終わらせておく。",en:"I will finish it ___ he comes.",o:["until","during","while","by the time"],a:3,why:"by the time+文で「〜する時までに」。timeは名詞だが、後ろに文が来る形で1つの接続詞として働く。",elim:"A=untilだと「彼が来るまでずっと終わらせ続ける」。B=duringは後ろに名詞が要る。C=whileは「〜する間」で期限にならない。"},
+{id:203,u:"h1fut2",jp:"彼が戻ったら電話します。",en:"I will call you when he ___ back.",o:["will come","comes","will have come","came"],a:1,why:"when・if・by the time などの時・条件の節は、未来の話でも現在形で書く（中2で出た規則がそのまま続く）。",elim:"A=時を表す節にwillは入れない。C=完了形も入れない。D=cameは過去の話になる。"},
+// ===== 高校: 形式目的語・同格のthat =====
+{id:204,u:"h1that",jp:"私は反対だと明確に伝えた。",en:"I made ___ clear that I disagreed.",o:["that","this","it","them"],a:2,why:"that節は動詞の直後に置けないので、いったん it を置いて中身を後ろに回す（make it clear that 〜）。",elim:"A=made that clear that ではthatが重なる。B=thisはこの形に使わない。D=themは複数のものを指す。"},
+{id:205,u:"h1that",jp:"彼が辞めたという事実は変わらない。",en:"The ___ that he quit will not change.",o:["way","place","time","fact"],a:3,why:"the fact that 〜で「〜という事実」。名詞の中身をthat節で言い直す形。thatの後ろは完全な文になる。",elim:"A=the way thatは「やり方」。B/C=place・timeは場所と時の話で、内容を言い直す形にならない。"},
+{id:206,u:"h1that",jp:"彼が欠席なのは妙だと思う。",en:"I think ___ strange that he is absent.",o:["this","it","that","so"],a:1,why:"thinkも同じで、that節を目的語の位置に直接置けない。itを先に置いて形容詞を続ける。",elim:"A=thisはこの形に使わない。C=thatが重なる。D=soは「そう思う」で後ろにthat節を続けられない。"},
+// ===== 高校: 目的・結果・程度 =====
+{id:207,u:"h1sothat",jp:"間に合うように早く出た。",en:"I left early ___ that I could be on time.",o:["such","so","too","very"],a:1,why:"so that+主語+can/could/will/would で「〜するために」。目的を表す。",elim:"A=suchは名詞とセット（such a 〜 that）。C=tooはtoo 〜 to の形をとる。D=veryにthatは続かない。"},
+{id:208,u:"h1sothat",jp:"難しすぎて理解できなかった。",en:"It was ___ difficult for me to understand.",o:["so","such","very","too"],a:3,why:"too 〜 to do で「〜すぎて…できない」。notを使わずに否定の意味になるのが要点。",elim:"A=soならso difficult that I could not understand の形が要る。B=suchは名詞とセット。C=veryだと「とても難しい」だけで「できない」が消える。"},
+{id:209,u:"h1sothat",jp:"とてもいい本だったので2回読んだ。",en:"It was ___ a good book that I read it twice.",o:["so","too","such","very"],a:2,why:"such+a+形容詞+名詞+that。うしろに名詞があるときはsuch、形容詞だけならso（so good that 〜）。",elim:"A=soならso good a book という硬い語順になる。B=tooはtoo 〜 to の形。D=veryにthatは続かない。"},
+// ===== 高校: 部分否定・否定の慣用 =====
+{id:210,u:"h1neg",jp:"全員が賛成したわけではない。",en:"___ everyone agreed.",o:["No","Not","None","Never"],a:1,why:"not+all/every/always で「全部ではない（一部はそうだった）」＝部分否定。全部の否定は No one agreed.",elim:"A=No everyone という形はない。C=Noneなら「誰も賛成しなかった」で全否定。D=Neverは頻度の否定。"},
+{id:211,u:"h1neg",jp:"彼はいつも正しいとは限らない。",en:"He is ___ always right.",o:["no","never","not","none"],a:2,why:"not always＝「いつもとは限らない」。時々は正しい、という含みが残る。",elim:"A=noは名詞を否定する語。B=neverだと「一度も正しくない」で全否定になり意味が変わる。D=noneは代名詞。"},
+{id:212,u:"h1neg",jp:"駅に着いて初めて財布がないと気づいた。",en:"It was not ___ I got to the station that I noticed my wallet was gone.",o:["when","before","after","until"],a:3,why:"It is not until 〜 that ... で「〜して初めて…する」。untilで固定の形。",elim:"A=whenだと「いつ」を強めるだけの強調構文で「初めて」が出ない。B=beforeでは時間の前後が逆。C=afterもこの定型にはならない。"},
+// ===== 高校: 無生物主語 =====
+{id:213,u:"h1nonh",jp:"この道を行けば駅に出ます。",en:"This road ___ you to the station.",o:["goes","arrives","reaches","takes"],a:3,why:"物を主語にして「連れて行く」と言う。日本語の「行けば」を主語にせず、道を主語にするのが英語の型。",elim:"A=goesは自動詞なので人を連れて行けない。B=arrivesも自動詞でyouを置けない。C=reachesだと「道が駅に達する」でyouの位置が合わない。"},
+{id:214,u:"h1nonh",jp:"この本を読めば理由が分かる。",en:"This book ___ you why.",o:["says","tells","talks","speaks"],a:1,why:"本・表・データを主語にして tell 人 を使う。「この本があなたに教える」と考える。",elim:"A=sayは人を直接置けない（say to you）。C/D=talk・speakはtoが要る。"},
+{id:215,u:"h1nonh",jp:"5分歩けば着きます。",en:"A five-minute walk ___ you there.",o:["will go","will arrive","will bring","will come"],a:2,why:"時間や距離を主語にして bring/take を使う。「5分の徒歩があなたをそこへ運ぶ」。",elim:"A=goは人を連れて行けない（自動詞）。B=arriveは自動詞でyouを置けない。D=comeも自動詞。"},
+// ===== 高校: 名詞構文・群前置詞 =====
+{id:216,u:"h1nomi",jp:"到着したらすぐ電話してください。",en:"Please call me ___ your arrival.",o:["on","in","at","by"],a:0,why:"on+動作の名詞で「〜したらすぐ」。when you arrive を名詞1語で言う形。メールや掲示で多い。",elim:"B=inは「〜の中で」。C=atは時刻や地点。D=byは期限（それまでに）。"},
+{id:217,u:"h1nomi",jp:"雨にもかかわらず試合は行われた。",en:"The game was held ___ spite of the rain.",o:["on","by","in","at"],a:2,why:"in spite of 〜で「〜にもかかわらず」。3語まとまって1つの前置詞として働く（群前置詞）。",elim:"A/B/D=on spite of・by spite of・at spite of という形は存在しない。inで固定。"},
+{id:218,u:"h1nomi",jp:"彼は遅刻することで有名だ。",en:"He is famous ___ being late.",o:["of","for","to","with"],a:1,why:"be famous for 〜で「〜で有名」。前置詞の後ろは名詞なので、動詞はingにして名詞の形にする。",elim:"A=famous of という形はない。C=toだと「〜に知られている」で相手を指す。D=withは「一緒に」。"},
 
 // ============================================================
 // ここから lv:2 ＝ 追加の2問。

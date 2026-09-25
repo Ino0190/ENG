@@ -84,12 +84,15 @@ p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
 
 <div class="screen on" id="scr-home">
   <h1>繰り返しで覚える</h1>
-  <p class="lead">2択で10秒判定、間違えた単語は<b>3回連続で正解するまで</b>出てくる。<b>レベル別</b>は初見の正答率で「どの帯から崩れてるか」が分かる。<b>仕事・趣味</b>は下にある。</p>
+  <p class="lead">2択で10秒判定、間違えた単語は<b>3回連続で正解するまで</b>出てくる。<b>レベル別</b>は初見の正答率で「どの帯から崩れてるか」が分かる。<b>仕事・趣味</b>と<b>語と語の組み合わせ</b>は下にある。</p>
   <div id="wordbreak"></div>
   <div id="decks"></div>
   <h2 class="secttl">仕事・趣味で使う単語</h2>
   <p class="sectlead">レベルの順番ではないので、崩れの起点の判定には入れていない。必要なところから取っていい。</p>
   <div id="topicdecks"></div>
+  <h2 class="secttl">語と語の組み合わせ</h2>
+  <p class="sectlead">文法が合っていても組み合わせを外すと不自然になる帯。<b>日本語から直訳すると選んでしまう方</b>を誤答に置いてある（決定を do / 〜について discuss about）。日本語だけ出るので、英語を思い出して選ぶ。</p>
+  <div id="coldecks"></div>
   <div class="deck" onclick="startNeed()" id="deck-need" style="border-color:var(--ng)">
     <div><h3>🔁 まだ覚えてないやつだけ</h3><p id="needdesc"></p></div>
   </div>
@@ -144,6 +147,10 @@ function deckDiag(did){
 // kind を持たない古いデータは level として扱う
 function levelDecks(){return WORD_DECKS.filter(d=>(d.kind||"level")==="level")}
 function topicDecks(){return WORD_DECKS.filter(d=>d.kind==="topic")}
+// 組み合わせのデッキ＝単語ではなくコロケーションを覚える。出題は日本語→英語の一方向だけ
+function colDecks(){return WORD_DECKS.filter(d=>d.kind==="collocation")}
+function deckKindOf(did){const d=WORD_DECKS.find(x=>x.id===did);return d?(d.kind||"level"):"level"}
+function isCol(w){return deckKindOf(w.deck)==="collocation"}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a}
 // 例文中の単語（不規則変化はexwの形）をハイライト
 function hiEx(w){
@@ -171,15 +178,18 @@ function renderHome(){
     const badge=needCnt?'<span class="badge">🔁 まだ'+needCnt+'語</span>':"";
     const g=deckDiag(d.id);
     // 分野別は「崩れの起点」の判定には使わないので、初見の数だけ出して合否の色は付けない
+    const diagOff=d.kind==="topic"||d.kind==="collocation";
     const diag=g.tried
-      ? (d.kind==="topic"
+      ? (diagOff
           ? '<div>覚えた '+g.ok+"/"+g.tried+'</div>'
           : '<div class="'+(g.rate>=0.7?"m":"bad")+'">初見 '+g.ok+"/"+g.tried+'</div>')
-      : '<div>'+(d.kind==="topic"?"未着手":"未診断")+'</div>';
-    return '<div class="deck" onclick="startDeck(\''+d.id+'\')"><div><h3>'+d.name+'</h3><p>'+d.desc+'</p>'+badge+'</div><div class="stat">'+ws.length+'語'+diag+'</div></div>';
+      : '<div>'+(diagOff?"未着手":"未診断")+'</div>';
+    const unit=d.kind==="collocation"?"組":"語";
+    return '<div class="deck" onclick="startDeck(\''+d.id+'\')"><div><h3>'+d.name+'</h3><p>'+d.desc+'</p>'+badge+'</div><div class="stat">'+ws.length+unit+diag+'</div></div>';
   };
   document.getElementById("decks").innerHTML=levelDecks().map(deckHtml).join("");
   document.getElementById("topicdecks").innerHTML=topicDecks().map(deckHtml).join("");
+  document.getElementById("coldecks").innerHTML=colDecks().map(deckHtml).join("");
   const needWords=WORDS.filter(w=>need[w.w]>0);
   document.getElementById("needdesc").textContent=needWords.length?needWords.length+"語が定着待ち。3回連続正解で消える。":"今はゼロ。デッキで間違えるとここに溜まる。";
 }
@@ -215,10 +225,12 @@ function showQ(){
   answered=false;
   const w=byW[queue[0]];
   // 英→日 / 日→英 をランダムに切り替え（両方向で覚える）
-  const dir=Math.random()<0.5?"e2j":"j2e";
+  // 組み合わせのデッキだけは日本語→英語の一方向。英語を見せたら答えが出てしまう
+  const col=isCol(w);
+  const dir=col?"j2e":(Math.random()<0.5?"e2j":"j2e");
   cur={w,dir};
-  document.getElementById("qdir").textContent=dir==="e2j"?"意味はどっち？":"英語はどっち？";
-  document.getElementById("qprog").textContent="残り "+queue.length+"語（覚えた "+mastered+"/"+total+"）";
+  document.getElementById("qdir").textContent=col?"組み合わせはどっち？":(dir==="e2j"?"意味はどっち？":"英語はどっち？");
+  document.getElementById("qprog").textContent="残り "+queue.length+(col?"組":"語")+"（覚えた "+mastered+"/"+total+"）";
   const ex=hiEx(w);
   if(dir==="e2j"){
     document.getElementById("qword").textContent=w.w;
@@ -227,7 +239,8 @@ function showQ(){
   }else{
     document.getElementById("qword").textContent=w.jp;
     document.getElementById("qex").innerHTML="　";
-    setOpts([w.w,pickDistractor(w,"w")],w.w);
+    // 組み合わせは誤答肢を alt で指定する（ランダムな別語だと意味で選べてしまう）
+    setOpts([w.w,col?w.alt:pickDistractor(w,"w")],w.w);
   }
   document.getElementById("qexp").className="exp";
   document.getElementById("nextbtn").className="nextbtn";

@@ -57,7 +57,21 @@ for(const d of WORD_DECKS){
   const n=WORDS.filter(w=>w.deck===d.id).length;
   if(n<2)errs.push("deck "+d.id+": 単語"+n+"語（2択が作れない）");
 }
-console.log("単語デッキ:",WORD_DECKS.length," 単語数:",WORDS.length);
+// 組み合わせのデッキは誤答肢を alt で明示する（ランダムな別語では意味で選べてしまう）
+const colDids=new Set(WORD_DECKS.filter(d=>d.kind==="collocation").map(d=>d.id));
+let nCol=0;
+for(const w of WORDS){
+  if(!colDids.has(w.deck)){
+    if(w.alt)errs.push(w.w+": altは組み合わせのデッキ専用（deck "+w.deck+" に付いている）");
+    continue;
+  }
+  nCol++;
+  if(!w.alt){errs.push(w.w+": alt（誤答肢）がない");continue;}
+  if(w.alt===w.w)errs.push(w.w+": altが正解と同じ");
+  if(w.alt.toLowerCase()===w.w.toLowerCase())errs.push(w.w+": altが大文字小文字だけの違い");
+}
+console.log("単語デッキ:",WORD_DECKS.length," 単語数:",WORDS.length,
+  " （うち組み合わせ",nCol,"）");
 
 // ===== bunpo.html（BUNPO配列と単元の対応） =====
 const bhtml=fs.readFileSync(path.join(__dirname,"bunpo.html"),"utf8");

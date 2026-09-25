@@ -14,6 +14,9 @@ const WORD_DECKS=[
   {id:"econ",kind:"topic",name:"経済ニュース",  desc:"物価・利回り・関税・利益率"},
   {id:"art", kind:"topic",name:"アートの表現",  desc:"構図・質感・彩度・呼び起こす"},
   {id:"car", kind:"topic",name:"車・運転",      desc:"操舵・排気量・空力・操縦性"},
+  // kind:"collocation" ＝ 単語ではなく「組み合わせ」を覚える。誤答肢は alt で指定する
+  {id:"col-vn",  kind:"collocation",name:"動詞＋名詞の組み合わせ",  desc:"make a decision / take measures / place an order"},
+  {id:"col-prep",kind:"collocation",name:"動詞＋前置詞の組み合わせ",desc:"depend on / comply with / discuss（aboutは不要）"},
 ];
 const WORDS=[
 // ===== 中1レベル =====
@@ -200,4 +203,30 @@ const WORDS=[
 {w:"handling",jp:"操縦性",hook:"ハンドリング。handle（扱う）の名詞",ex:"The handling is sharp.",exjp:"操縦性が鋭い。",deck:"car"},
 {w:"cornering",jp:"コーナリング",hook:"corner（角）を曲がること",ex:"Cornering is stable at speed.",exjp:"高速でも安定して曲がる。",deck:"car"},
 {w:"aerodynamics",jp:"空力",hook:"エアロ。air（空気）＋dynamics（力学）",ex:"Aerodynamics reduce drag.",exjp:"空力が抗力を減らす。",deck:"car"},
+// ===== 動詞＋名詞の組み合わせ（alt＝日本語から直訳すると選んでしまう方） =====
+{w:"make a decision",jp:"決定を下す",alt:"do a decision",hook:"「決定をする」でもdoは使わない。無かったものを作り出す側のmake",ex:"We need to make a decision by Friday.",exjp:"金曜までに決定する必要がある。",deck:"col-vn"},
+{w:"take measures",jp:"対策を取る",alt:"do measures",hook:"日本語の「取る」がそのままtake。measureは「措置」",ex:"We will take measures to prevent it.",exjp:"再発防止の対策を取ります。",deck:"col-vn"},
+{w:"reach an agreement",jp:"合意に達する",alt:"arrive an agreement",hook:"reachは「手が届く」。arriveは後ろにatが必要になる",ex:"They finally reached an agreement.",exjp:"ようやく合意に達した。",exw:"reached",deck:"col-vn"},
+{w:"raise a concern",jp:"懸念を挙げる",alt:"rise a concern",hook:"raiseは「他の物を上げる」、riseは「自分が上がる」。挙げるのは他動詞のraise",ex:"He raised a concern about the cost.",exjp:"彼が費用の懸念を挙げた。",exw:"raised",deck:"col-vn"},
+{w:"meet the deadline",jp:"締切に間に合わせる",alt:"catch the deadline",hook:"meetは「会う」だけでなく「要求に応える」。条件を満たす時もmeet",ex:"We can still meet the deadline.",exjp:"まだ締切に間に合う。",deck:"col-vn"},
+{w:"address an issue",jp:"課題に対処する",alt:"address to an issue",hook:"アドレス＝宛先を向けること。他動詞なのでtoを入れない",ex:"We should address an issue early.",exjp:"課題には早めに対処すべきだ。",deck:"col-vn"},
+{w:"hold a meeting",jp:"会議を開く",alt:"open a meeting",hook:"日本語は「開く」だが、催すという意味のholdを使う",ex:"We will hold a meeting next week.",exjp:"来週会議を開きます。",deck:"col-vn"},
+{w:"place an order",jp:"発注する",alt:"put an order",hook:"placeは「置く」。注文を先方に置く＝発注",ex:"We placed an order yesterday.",exjp:"昨日発注した。",exw:"placed",deck:"col-vn"},
+{w:"conduct a survey",jp:"調査を実施する",alt:"make a survey",hook:"コンダクター（指揮者）。仕切って実施する側",ex:"We will conduct a survey in May.",exjp:"5月に調査を実施する。",deck:"col-vn"},
+{w:"draw a conclusion",jp:"結論を導く",alt:"pull a conclusion",hook:"drawは「線を引く・描く」。線を引いて結論まで持っていく",ex:"It is too early to draw a conclusion.",exjp:"結論を出すには早すぎる。",deck:"col-vn"},
+{w:"pay attention",jp:"注意を払う",alt:"pay an attention",hook:"日本語の「払う」と同じ。attentionは数えないのでaを付けない",ex:"Please pay attention to the numbers.",exjp:"数字に注意を払ってください。",deck:"col-vn"},
+{w:"take a look",jp:"ちょっと見る",alt:"see a look",hook:"Take a look＝「ちょっと見て」。メールの定型",ex:"Could you take a look at this?",exjp:"これを見ていただけますか。",deck:"col-vn"},
+// ===== 動詞＋前置詞の組み合わせ（altは日本語の助詞から選んでしまう方） =====
+{w:"depend on",jp:"〜に依存する",alt:"depend to",hook:"ディペンデント。相手の上に乗っている＝on",ex:"The result depends on the data.",exjp:"結果はデータ次第だ。",exw:"depends",deck:"col-prep"},
+{w:"consist of",jp:"〜から成る",alt:"consist from",hook:"日本語は「から」だがfromではなくof。中身を指すof",ex:"The team consists of five people.",exjp:"チームは5人から成る。",exw:"consists",deck:"col-prep"},
+{w:"result in",jp:"結果として〜になる",alt:"result to",hook:"結果の中へ入っていく＝in。原因を言うときは result from",ex:"The delay resulted in extra cost.",exjp:"遅れが追加費用を生んだ。",exw:"resulted",deck:"col-prep"},
+{w:"focus on",jp:"〜に集中する",alt:"focus at",hook:"フォーカス。的の上にぴったり乗せる＝on",ex:"Let us focus on the main issue.",exjp:"主要な課題に集中しよう。",deck:"col-prep"},
+{w:"refer to",jp:"〜を参照する",alt:"refer at",hook:"リファレンス。矢印を向ける＝to",ex:"Please refer to page ten.",exjp:"10ページを参照してください。",deck:"col-prep"},
+{w:"comply with",jp:"〜に従う",alt:"comply to",hook:"コンプライアンス。規則と一緒に歩く＝with",ex:"We must comply with the rules.",exjp:"規則に従わなければならない。",deck:"col-prep"},
+{w:"account for",jp:"〜を占める・説明する",alt:"account of",hook:"アカウント（勘定）。そのぶんを勘定に入れる＝for",ex:"Labor costs account for half of it.",exjp:"人件費が半分を占める。",deck:"col-prep"},
+{w:"deal with",jp:"〜を扱う・対応する",alt:"deal to",hook:"ディール（取引）。相手と組んで扱う＝with",ex:"I will deal with the complaint.",exjp:"そのクレームには私が対応する。",deck:"col-prep"},
+{w:"discuss the issue",jp:"その課題について話し合う",alt:"discuss about the issue",hook:"日本語の「について」でaboutを入れたくなるが不要。discussは他動詞",ex:"Let us discuss the issue tomorrow.",exjp:"明日その課題を話し合おう。",deck:"col-prep"},
+{w:"attend the meeting",jp:"会議に出席する",alt:"attend to the meeting",hook:"日本語の「に」でtoを入れたくなるが不要。attend toは「対応する」で別の意味になる",ex:"I cannot attend the meeting today.",exjp:"今日は会議に出席できない。",deck:"col-prep"},
+{w:"based on",jp:"〜に基づく",alt:"based in",hook:"ベース（土台）の上に乗る＝on。based inは「〜に拠点がある」で別の意味",ex:"The plan is based on last year's data.",exjp:"その計画は昨年のデータに基づく。",deck:"col-prep"},
+{w:"look forward to",jp:"〜を楽しみにする",alt:"look forward for",hook:"メールの結びの定型。toが前置詞なので後ろは動詞のing形",ex:"I look forward to meeting you.",exjp:"お会いするのを楽しみにしています。",deck:"col-prep"},
 ];
