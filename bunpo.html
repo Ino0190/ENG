@@ -15,7 +15,7 @@ html,body{background:var(--bg);color:var(--text);font-family:-apple-system,'Hira
 body{padding:0 16px 60px;max-width:760px;margin:0 auto}
 header{position:sticky;top:0;z-index:10;background:rgba(15,20,32,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 0;margin:0 -16px 4px;padding-left:16px;padding-right:16px;display:flex;flex-direction:column;align-items:stretch;gap:8px}
 .htitle{font-size:16px;font-weight:700;color:var(--accent)}
-.hnav{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.hnav{display:flex;flex-wrap:wrap;gap:8px 8px}
 .hnav::-webkit-scrollbar{display:none}
 .hnav a{flex:0 0 auto;white-space:nowrap;color:var(--sub);font-size:14px;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px}
 h1{font-size:26px;line-height:1.5;margin:26px 0 8px}
@@ -165,6 +165,42 @@ trap:"<b>Seeing from the mountain, the lake... が最頻出の引っかけ。</b
 core:"the town <b>where</b> I was born（生まれた町）。whichとの見分けは<b>ぶら下げた文に穴があるか</b>: 穴なし（I was bornで完全）→where/when/why、穴あり→which。whichで言うなら前置詞を戻す（the house <b>in which</b> I lived）。<b>前置詞の直後に置けるのはwhichだけ</b>（in where / in that は存在しない形）。",
 ex:[["This is the town <b>where</b> I was born.","私が生まれた町。","文が完全→where"],["This is the house <b>in which</b> I lived.","私が住んでいた家。","前置詞+which"],["Do you know the reason <b>why</b> he was late?","遅刻した理由を知ってる？","理由はwhy"]],
 trap:"<b>where か which かで迷ったら、ぶら下げた文だけ取り出して読む。</b>それだけで文として完成していればwhere、「何が/何を」が欠けていればwhich。"},
+{u:"h1pass2",t:"受け身の言い方を広げる（言われている・延期された）",term:"受動態の発展（be said to / 句動詞の受け身 / be supposed to）",
+core:"「〜だと言われている」は He <b>is said to</b> be a genius.＝They say that he is ... の言い換え。<b>句動詞もそのまま受け身にできる</b>: put off（延期する）→ was <b>put off</b>。offなどの部品は落とさず後ろに残す。be supposed to 〜（〜することになっている）も受け身の形のまま1つの言い方として覚える。",
+ex:[["He <b>is said to</b> be a genius.","彼は天才だと言われている。","to の後ろは原形"],["The meeting <b>was put off</b>.","会議は延期された。","offを落とさない"],["You <b>are supposed to</b> wait here.","ここで待つことになっている。","決まり・約束"]],
+trap:"<b>was putted は存在しない。</b>putの過去分詞はputのまま。cut・setも同じで形が変わらない動詞は受け身か能動か見た目で分からないので、be動詞があるかで判断する。"},
+{u:"h1caus",t:"「〜させる」「〜するのを見る」の後ろは to を付けない",term:"使役動詞（make/let/have）・知覚動詞（see/hear/feel）",
+core:"make/let/have と see/hear/feel は<b>「人+動詞の原形」</b>を後ろに置く。My mother made me <b>clean</b> my room.（to cleanにしない）。強さで使い分ける: make=無理にやらせる、have=頼んでやってもらう、let=やらせてやる。知覚動詞は<b>最後まで見たら原形・途中の一場面なら〜ing</b>（saw him <b>enter</b> / saw him <b>entering</b>）。",
+ex:[["My mother made me <b>clean</b> my room.","母は私に部屋を掃除させた。","to を付けない"],["I saw him <b>enter</b> the room.","彼が部屋に入るのを見た。","最後まで見た"],["I <b>had</b> him help me.","彼に手伝ってもらった。","頼んだ"]],
+trap:"<b>get だけ to が要る</b>（I <b>got</b> him <b>to</b> help me.）。helpは両方OK（help me carry / help me to carry）。「使役は全部原形」と覚えるとgetで外す。"},
+{u:"h1what",t:"「〜すること」を1語で作る what と「〜しても」の whatever",term:"関係代名詞what・複合関係詞（whatever / whoever / however）",
+core:"<b>what = the thing which</b>。先行詞を自分の中に持っているので、前に名詞を置かない。<b>What</b> he said is true.（彼が言ったこと）。-everが付くと「〜しても」: whatever（何が）・whoever（誰が）・whenever（いつ）・however（どんなに）。<b>howeverだけは後ろに形容詞か副詞が要る</b>: <b>However difficult</b> it is, ...",
+ex:[["<b>What</b> he said is true.","彼が言ったことは本当だ。","前に名詞を置かない"],["<b>Whatever</b> happens, I won't give up.","何が起きても諦めない。","主語の役もする"],["<b>However difficult</b> it is, I will try.","どんなに難しくてもやってみる。","形容詞が直後"]],
+trap:"<b>the thing what he said は×</b>（thingとwhatが重複）。whatを見たら「その前に名詞が無いこと」を確かめる。名詞があるならwhich/thatを使う。"},
+{u:"h1comp2",t:"比較の決まり文句（〜ほど〜 / というより / 〜しか）",term:"比較の慣用表現（the 〜er the 〜er / not so much A as B / no more than）",
+core:"<b>the+比較級, the+比較級</b>で「〜ほど〜」: The harder you work, <b>the more</b> tired you get.（2つ目のtheも必要）。<b>not so much A as B</b>＝「AというよりB」で、強いのは後ろのB。数の慣用はnoが付くかで別物: <b>no more than</b>＝only（〜しかない）、<b>no less than</b>＝as much as（〜も）、not more than＝at most（多くても）。",
+ex:[["The harder you work, <b>the more</b> tired you get.","働けば働くほど疲れる。","the を2つ"],["He is <b>not so much</b> a scholar <b>as</b> a writer.","学者というより作家だ。","強いのは後ろ"],["I have <b>no more than</b> 1,000 yen.","1000円しか持っていない。","only の意味"]],
+trap:"<b>no more than と not more than は別物。</b>noが付くと「少ないぞ」という気持ちが乗ってonly、notだと単なる上限（多くても）。less側も同じでno less thanは「〜も」と多い側に振れる。"},
+{u:"h1rep",t:"「〜と言った」の中身は時間を1つ後ろにずらす",term:"話法（直接話法・間接話法）・時制の一致",
+core:"主の動詞が過去（said）なら、thatの中の時間も<b>1段だけ過去にずらす</b>: is→was、will→would、have done→had done。今の話でも He said he <b>was</b> busy. 時を表す語も一緒にずらす（tomorrow→the next day、yesterday→the day before）。命令を伝えるときは<b>tell 人 to 〜</b>（sayは後ろに人を直接置けない）。",
+ex:[["He said that he <b>was</b> busy.","彼は忙しいと言った。","is→was"],["He said he <b>would</b> come the next day.","翌日来ると言った。","will→would"],["He <b>told</b> me <b>to</b> wait.","私に待つように言った。","tell 人 to"]],
+trap:"<b>said to me は言えるが said me は×。</b>sayは人を直接後ろに置けない動詞。人を先に置くならtellを使う。この2つの取り違えはメールで頻発する。"},
+{u:"h1inv",t:"否定の言葉を文頭に出すと、後ろが疑問文の形になる",term:"倒置・否定の強調（Never have I / not only 〜 but also / Hardly 〜 when）",
+core:"never・hardly・littleなどの<b>否定語を文頭に出すと、その後ろが疑問文の語順</b>になる: <b>Never have I seen</b> such a beautiful view.（I have seenにしない）。<b>not only A but also B</b>＝「AだけでなくBも」で、butが相手。<b>Hardly had A done when B</b>＝「AするとすぐB」も、hardlyが否定語なので倒置する。",
+ex:[["<b>Never have I seen</b> such a beautiful view.","こんな美しい景色は見たことがない。","have を前に"],["He speaks <b>not only</b> English <b>but also</b> Chinese.","英語だけでなく中国語も話す。","but がセット"],["<b>Hardly had</b> I got home <b>when</b> it began to rain.","家に着くとすぐ雨が降り始めた。","hardly も否定語"]],
+trap:"<b>almost・nearly は否定語ではないので倒置しない。</b>hardly（ほとんど〜ない）とalmost（ほとんど〜だ）は日本語が似ているのに中身が逆。hardlyを見たら否定側と判断する。"},
+{u:"h1emph",t:"「〜なのは○○だ」と1か所だけ強く言う形",term:"強調構文（It is 〜 that ...）・do による動詞の強調",
+core:"強く言いたい部分を It is と that の間に挟む: <b>It was he that</b> broke the window.（窓を割ったのは彼だ）。挟むのは名詞でも副詞句でもよく、つなぎは<b>人でもモノでも that</b> で足りる。動詞を強めたいときは前に<b>do/does/did</b>を置く: I <b>do</b> want to see you.（本当に会いたい）。",
+ex:[["<b>It was he that</b> broke the window.","窓を割ったのは彼だ。","that の後ろが動詞＝主格"],["I <b>do</b> want to see you.","本当にあなたに会いたい。","動詞の前に do"],["<b>It is</b> time <b>that</b> we need.","私たちに必要なのは時間だ。","モノでも that"]],
+trap:"<b>強調構文と It is ... that の形式主語は見た目が同じ。</b>見分け方は「It is と that を取り除いて文になるか」。He broke the window. になる＝強調構文。文にならない＝形式主語（It is true that 〜）。"},
+{u:"h1art",t:"a か the か無印か ／ s を付けられない名詞",term:"冠詞（a / an / the）・可算名詞と不可算名詞",
+core:"<b>1回目は a、2回目からは the</b>（相手も「あれね」と分かるものがthe）。<b>information・homework・advice・furniture・news は s も a も付けない</b>。数えたいときは a piece of information のように単位を借りる。量を言うときは、数えるものにmany/a few、数えないものにmuch/a littleを使う。",
+ex:[["I have <b>a</b> dog. <b>The</b> dog is white.","犬を飼っている。その犬は白い。","2回目は the"],["I need more <b>information</b>.","もっと情報が必要だ。","s も a も付けない"],["I have <b>much</b> homework.","宿題がたくさんある。","数えないので much"]],
+trap:"<b>informations・homeworks・advices は全部×。</b>日本語では「情報」を数える感覚があるので付けてしまう。sを付けたくなったら「a piece of 〜 で言えるか」を思い出す。"},
+{u:"h1prep",t:"似た前置詞の境目（by/until・for/during・between/among）",term:"前置詞の使い分け",
+core:"<b>by=期限（それまでに1回やる）／until=継続（それまでずっと）</b>: finish it <b>by</b> five / wait <b>until</b> five。<b>for=期間の長さ</b>（for three days）／<b>during=決まった期間の名前</b>（during the summer）。<b>between=2つの間／among=3つ以上</b>。whileは前置詞ではなく接続詞なので、後ろに文が来る。",
+ex:[["Please finish this <b>by</b> five.","5時までに終わらせて。","1回やる＝by"],["I stayed there <b>for</b> three days.","3日間そこに滞在した。","長さ＝for"],["There is no difference <b>between</b> the two.","2つの間に違いはない。","2つ＝between"]],
+trap:"<b>during three days は×。</b>後ろが数字を含む長さなら for、後ろが「夏休み・授業・旅行」など期間の名前なら during。この見分けだけで両方の誤用が消える。"},
 ];
 </script>
 <script>

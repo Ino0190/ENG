@@ -21,11 +21,21 @@ const UNITS = [
   {id:"m3part", g:"中3", name:"分詞の後置修飾", desc:"running boy / made in Japan"},
   {id:"m3rel",  g:"中3", name:"関係代名詞", desc:"who / which / 省略"},
   {id:"m3indq", g:"中3", name:"間接疑問文", desc:"語順を普通の文に戻す"},
+  // 高校範囲は学習の順に並べる（この順序が「崩れの起点」の判定に使われる）
   {id:"h1tense",g:"高校", name:"過去完了・完了進行形", desc:"had done / have been 〜ing"},
-  {id:"h1subj", g:"高校", name:"仮定法", desc:"If I were / If I had done"},
   {id:"h1auxp", g:"高校", name:"助動詞+have+過去分詞", desc:"should have done"},
+  {id:"h1pass2",g:"高校", name:"受動態の発展", desc:"be said to / 句動詞の受け身"},
+  {id:"h1caus", g:"高校", name:"使役・知覚動詞", desc:"make/let/have + 原形 / see 〜 ing"},
   {id:"h1partc",g:"高校", name:"分詞構文", desc:"Walking in the park, ..."},
+  {id:"h1what", g:"高校", name:"関係代名詞what・複合関係詞", desc:"what / whatever / however"},
   {id:"h1rel2", g:"高校", name:"関係副詞・前置詞+関係代名詞", desc:"where / in which"},
+  {id:"h1comp2",g:"高校", name:"比較の慣用", desc:"the 〜er the 〜er / not so much A as B"},
+  {id:"h1subj", g:"高校", name:"仮定法", desc:"If I were / If I had done"},
+  {id:"h1rep",  g:"高校", name:"話法と時制の一致", desc:"said that he would / told me to"},
+  {id:"h1inv",  g:"高校", name:"倒置・否定の強調", desc:"Never have I / not only 〜 but also"},
+  {id:"h1emph", g:"高校", name:"強調構文", desc:"It is 〜 that / do 強調"},
+  {id:"h1art",  g:"高校", name:"冠詞・可算不可算", desc:"a / the / information には s を付けない"},
+  {id:"h1prep", g:"高校", name:"前置詞の使い分け", desc:"by/until, for/during, between/among"},
 ];
 const QUESTIONS = [
 // ===== 中1: be動詞と一般動詞 =====
@@ -124,6 +134,42 @@ const QUESTIONS = [
 {id:70,u:"h1rel2",jp:"ここは私が生まれた町だ。",en:"This is the town ___ I was born.",o:["which","where","that","what"],a:1,why:"後ろの文（I was born）が完全な形→関係副詞where。whichを使うなら前置詞が要る（in which）。「後ろの文に穴があるか」で代名詞/副詞を見分ける。",elim:"A=whichだとI was born ___ の穴がなく繋がらない。C=thatも代名詞なので同じ理由でダメ。D=whatは先行詞を含む。"},
 {id:71,u:"h1rel2",jp:"これは私が住んでいた家だ。",en:"This is the house in ___ I lived.",o:["which","where","that","what"],a:0,why:"前置詞の直後に置けるのはwhichだけ。in where / in that は形として存在しない。",elim:"B=whereは前置詞を含んだ副詞なのでinと重複する。C=前置詞+thatは不可（関係代名詞の中で唯一の弱点）。D=whatは先行詞を含む。"},
 {id:72,u:"h1rel2",jp:"彼が遅刻した理由を知っていますか。",en:"Do you know the reason ___ he was late?",o:["why","which","where","how"],a:0,why:"先行詞the reason+完全な文→関係副詞why。the reason why 〜で「〜の理由」。",elim:"B=後ろの文に穴がないのでwhichは使えない。C=whereは場所。D=howはthe wayと一緒に使えない（the way howは×）逆に単独ならOK。"},
+// ===== 高校: 受動態の発展 =====
+{id:73,u:"h1pass2",jp:"彼は天才だと言われている。",en:"He ___ to be a genius.",o:["is said","says","is saying","said"],a:0,why:"「〜だと言われている」はbe said to 〜。彼は言われる側なので受け身にし、toの後ろは原形のままにする。",elim:"B=saysだと「彼が言う」になる。C=進行形も彼が言っている側。D=saidだけでは「彼が言った」。"},
+{id:74,u:"h1pass2",jp:"会議は延期された。",en:"The meeting ___ off.",o:["put","was put","was putted","did put"],a:1,why:"put off（延期する）のような句動詞も受け身にできる。be+過去分詞にして、offはそのまま後ろに残す。",elim:"A=putだけだと「会議が何かを延期した」。C=putの過去分詞はputで、puttedという形はない。D=能動の形。"},
+{id:75,u:"h1pass2",jp:"あなたはここで待つことになっている。",en:"You ___ to wait here.",o:["are supposing","suppose","are supposed","supposed"],a:2,why:"be supposed to 〜で「〜することになっている」。受け身の形のまま1つの言い方として覚える。",elim:"A=進行形だと「あなたが想像している」。B=supposeは「〜だと思う」。D=be動詞が抜けている。"},
+// ===== 高校: 使役・知覚動詞 =====
+{id:76,u:"h1caus",jp:"母は私に部屋を掃除させた。",en:"My mother made me ___ my room.",o:["clean","to clean","cleaning","cleaned"],a:0,why:"make/let/have（〜させる）の後ろは「人+原形」。toは付けない。",elim:"B=makeにto不定詞は付かない（helpだけは両方使える）。C=〜ingは「〜しているのを見た」型の形。D=過去分詞だと掃除される側の意味になる。"},
+{id:77,u:"h1caus",jp:"私は彼が部屋に入るのを見た。",en:"I saw him ___ the room.",o:["to enter","entered","enters","enter"],a:3,why:"see/hear/feelも後ろは「人+原形」。最後まで見たなら原形、途中の一場面なら〜ing（saw him entering）。",elim:"A=知覚動詞にtoは付かない（受け身のwas seen to enterだけ例外）。B/C=活用した形は置けない。"},
+{id:78,u:"h1caus",jp:"私は彼に手伝ってもらった。",en:"I ___ him help me.",o:["let","made","had","got"],a:2,why:"have+人+原形で「（頼んで）〜してもらう」。makeは強制、letは許可、haveは依頼。",elim:"A=letは「させてやる（許可）」。B=madeは無理にやらせる。D=getなら get him to help でtoが要る。"},
+// ===== 高校: 関係代名詞what・複合関係詞 =====
+{id:79,u:"h1what",jp:"彼が言ったことは本当だ。",en:"___ he said is true.",o:["That","What","Which","Who"],a:1,why:"what=「〜すること・もの」。the thing which を1語にしたものなので、前に先行詞を置かない。",elim:"A=Thatで始めると主語になりにくくIt is true that 〜にする。C=whichは前に先行詞が要る。D=whoは人を受ける。"},
+{id:80,u:"h1what",jp:"何が起きても私は諦めない。",en:"___ happens, I won't give up.",o:["Whatever","However","Whoever","Whenever"],a:0,why:"whatever＝no matter what「何が〜しても」。後ろに主語が無く動詞が続く＝whateverが主語の役をしている。",elim:"B=Howeverは後ろに形容詞か副詞が要る。C=Whoeverは「誰が」。D=Wheneverは「いつ〜しても」。"},
+{id:81,u:"h1what",jp:"どんなに難しくても、やってみます。",en:"___ difficult it is, I will try.",o:["Whatever","Whichever","However","Whenever"],a:2,why:"however+形容詞/副詞+主語+動詞の語順。difficultが直後に来ているのが合図。",elim:"A=Whateverの後ろに形容詞は置かない。B=Whicheverは選ぶ対象がある時。D=Wheneverは時の話。"},
+// ===== 高校: 比較の慣用 =====
+{id:82,u:"h1comp2",jp:"働けば働くほど疲れる。",en:"The harder you work, ___ tired you get.",o:["the more","more","the most","much"],a:0,why:"the+比較級, the+比較級で「〜ほど〜」。2つ目のtheも必ず要る。tiredは-erを付けずmoreを使う語。",elim:"B=theが抜けている。C=最上級はこの形に入らない。D=muchでは比較にならない。"},
+{id:83,u:"h1comp2",jp:"彼は学者というよりは作家だ。",en:"He is not ___ a scholar as a writer.",o:["as much","so much","too much","very much"],a:1,why:"not so much A as B で「AというよりB」。後ろのasが合図で、強いのは後ろのB。",elim:"A=as much 〜 as は「同じくらい多く」で対比にならない。C=too muchは「多すぎる」。D=very muchにasは続かない。"},
+{id:84,u:"h1comp2",jp:"私は1000円しか持っていない。",en:"I have ___ than 1,000 yen.",o:["no less","not more","less","no more"],a:3,why:"no more than 〜＝only「〜しかない」。noが付くと数の話ではなく「少ないぞ」という気持ちの話になる。",elim:"A=no less thanは「1000円も持っている」で逆。B=not more thanは「多くても1000円」。C=less thanは1000円未満で1000円を含まない。"},
+// ===== 高校: 話法と時制の一致 =====
+{id:85,u:"h1rep",jp:"彼は忙しいと言った。",en:"He said that he ___ busy.",o:["is","was","has been","will be"],a:1,why:"主の動詞が過去（said）なら、中の時間も1つ過去にずらす。「今忙しい」と言ったのでもwasにする。",elim:"A=isは今も変わらない事実の時だけの例外。C=has beenは現在完了でsaidと合わない。D=will beはwouldにずらす。"},
+{id:86,u:"h1rep",jp:"彼は翌日来ると言った。",en:"He said he ___ come the next day.",o:["would","will","is going to","comes"],a:0,why:"willはsaidに合わせてwouldにずらす。tomorrowもthe next dayに変える。",elim:"B=willは時制がずれている。C=is going toも現在形なのでwas going toにする。D=comesでは予定の意味が消える。"},
+{id:87,u:"h1rep",jp:"彼は私に待つように言った。",en:"He ___ me to wait.",o:["said","told","spoke","talked"],a:1,why:"tell 人 to 〜で「人に〜するよう言う」。sayは後ろに人を直接置けない。",elim:"A=saidなら He said to me, \"Wait.\" の形になる。C/D=speak/talkはtoが要り、to不定詞の指示は続けられない。"},
+// ===== 高校: 倒置・否定の強調 =====
+{id:88,u:"h1inv",jp:"こんなに美しい景色は見たことがない。",en:"Never ___ such a beautiful view.",o:["I have seen","have I seen","I saw","did I saw"],a:1,why:"否定語を文頭に出すと、後ろが疑問文の語順になる（倒置）。Never have I seen 〜。",elim:"A=倒置していない。C=I sawも倒置なし。D=didの後ろは原形。"},
+{id:89,u:"h1inv",jp:"彼は英語だけでなく中国語も話す。",en:"He speaks not only English ___ also Chinese.",o:["but","and","or","as"],a:0,why:"not only A but also B で「AだけでなくBも」。butがセットの相手。",elim:"B=andではnot onlyと噛み合わない。C=orは「または」。D=asはペアにならない。"},
+{id:90,u:"h1inv",jp:"家に着くとすぐ雨が降り始めた。",en:"___ had I got home when it began to rain.",o:["Almost","Nearly","Rarely","Hardly"],a:3,why:"Hardly had A done when B で「AするとすぐB」。hardlyが否定語なので倒置が起きる。",elim:"A/B=almost・nearlyは否定語でないので倒置しない。C=rarelyは「めったに〜ない」で頻度の話。"},
+// ===== 高校: 強調構文 =====
+{id:91,u:"h1emph",jp:"窓を割ったのは彼だ。",en:"It was ___ that broke the window.",o:["him","he","his","he was"],a:1,why:"It is 〜 that ... の強調構文。thatの後ろがbroke（動詞）なので、強調したのは主語＝主格he。",elim:"A=himは目的語の位置の形。C=hisは「彼の」。D=he wasだとthatの後ろの動詞と重なる。"},
+{id:92,u:"h1emph",jp:"私は本当にあなたに会いたい。",en:"I ___ want to see you.",o:["do","am","very","much"],a:0,why:"一般動詞を強めるときは前にdo/does/didを置く。I do want 〜＝「本当に〜したい」。",elim:"B=amとwantは並べない。C=veryは動詞を直接強められない。D=muchは後ろに置く語。"},
+{id:93,u:"h1emph",jp:"私たちに必要なのは時間だ。",en:"It is time ___ we need.",o:["what","that","who","whom"],a:1,why:"It is 〜 that の強調構文。強調する語が人でもモノでもthatでつなげる。",elim:"A=whatは先行詞を含むのでItと重複する。C/D=who/whomは人の時だけ。"},
+// ===== 高校: 冠詞・可算不可算 =====
+{id:94,u:"h1art",jp:"もっと情報が必要だ。",en:"I need more ___.",o:["informations","an information","the informations","information"],a:3,why:"informationは数えない名詞。sもaも付けない。1件と数えたいなら a piece of information。",elim:"A/C=sを付けられない。B=aも付かない。"},
+{id:95,u:"h1art",jp:"犬を1匹飼っている。その犬は白い。",en:"I have a dog. ___ dog is white.",o:["The","A","One","Some"],a:0,why:"1回目はa、2回目からは「さっき言ったあれ」なのでthe。",elim:"B=Aだともう1匹別の犬の話になる。C=Oneは数を強調する言い方。D=Someは不特定。"},
+{id:96,u:"h1art",jp:"宿題がたくさんある。",en:"I have ___ homework.",o:["many","much","a few","few"],a:1,why:"homeworkは数えない名詞なので、数を表すmanyやa fewは付かない。量にはmuchを使う。",elim:"A=manyは数えられる名詞用。C/D=a few・fewも数えられる名詞用。"},
+// ===== 高校: 前置詞の使い分け =====
+{id:97,u:"h1prep",jp:"5時までにこれを終わらせて。",en:"Please finish this ___ five.",o:["by","until","till","in"],a:0,why:"by=期限（それまでに1回やる）、until=継続（それまでずっと）。finishは1回の動作なのでby。",elim:"B/C=until/tillだと「5時まで終わらせ続ける」になる。D=inは「5時間後に」の意味。"},
+{id:98,u:"h1prep",jp:"私は3日間そこに滞在した。",en:"I stayed there ___ three days.",o:["during","while","for","in"],a:2,why:"for+期間の長さ（three days）。duringは決まった期間の名前に付く（during the summer）。",elim:"A=duringの後ろは「夏休み」のような期間の名前。B=whileは接続詞で後ろに文が要る。D=inは「3日後に」。"},
+{id:99,u:"h1prep",jp:"その2つの間に違いはない。",en:"There is no difference ___ the two.",o:["among","between","in","of"],a:1,why:"between=2つの間、among=3つ以上。the twoなのでbetween。",elim:"A=amongは3つ以上。C=inは「中に」。D=ofでは2つの関係が表せない。"},
 
 // ============================================================
 // ここから lv:2 ＝ 追加の2問。

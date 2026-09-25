@@ -16,7 +16,7 @@ html,body{background:var(--bg);color:var(--text);font-family:-apple-system,'Hira
 body{padding:0 0 60px;max-width:680px;margin:0 auto;min-height:100vh}
 header{position:sticky;top:0;z-index:10;background:rgba(15,20,32,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;flex-direction:column;align-items:stretch;gap:8px}
 .htitle{font-size:16px;font-weight:700;color:var(--accent)}
-.hnav{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.hnav{display:flex;flex-wrap:wrap;gap:8px 8px}
 .hnav::-webkit-scrollbar{display:none}
 .hnav a{flex:0 0 auto;white-space:nowrap;color:var(--sub);font-size:14px;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px}
 .screen{display:none;padding:18px 16px}
@@ -152,7 +152,7 @@ details.jinv summary{cursor:pointer;font-size:14px;color:var(--blue);font-weight
     <button class="mode sub" id="btn-all-quiz" onclick="startQuiz(null)">✏️ 試す</button>
   </div>
   <div class="deck" onclick="startLearn('key')" id="deck-key" style="border-color:var(--blue)">
-    <div><h3>🗣 暗唱セット（13文）</h3><p class="cue" id="keydesc"></p></div>
+    <div><h3>🗣 暗唱セット（16文）</h3><p class="cue" id="keydesc"></p></div>
     <div class="stat"><div class="m" id="keystat"></div></div>
   </div>
   <button class="bigbtn sub" onclick="show('scr-chart')">🔍 ステージごとの見分け方</button>
