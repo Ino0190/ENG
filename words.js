@@ -1,12 +1,19 @@
 // 英単語amida用データ。中1→高校のレベル層×代表サンプルで「どの帯から崩れるか」を診断する
 // 単語は無限にあるが頻度順で層になっているので、各レベルの代表語で診断が成立する
 // w=単語 jp=意味 hook=覚えるフック ex/exjp=例文 exw=例文中の語形（変化形の時だけ） deck=レベルid
+// kind:"level" ＝ 頻度順のレベル。これだけが「崩れの起点」の診断に使われる。
+// kind:"topic" ＝ 分野別。レベルではないので診断の判定には混ぜない（混ぜると起点がずれる）。
 const WORD_DECKS=[
-  {id:"m1",name:"中1レベル",desc:"毎日の動作の基本動詞"},
-  {id:"m2",name:"中2レベル",desc:"やりとり・移動・気持ち"},
-  {id:"m3",name:"中3レベル",desc:"経験・社会・少し抽象"},
-  {id:"h1",name:"高校基礎レベル",desc:"提供する・要求する・利用できる"},
-  {id:"h2",name:"高校標準レベル",desc:"評価する・維持する・有意な"},
+  {id:"m1",kind:"level",name:"中1レベル",desc:"毎日の動作の基本動詞"},
+  {id:"m2",kind:"level",name:"中2レベル",desc:"やりとり・移動・気持ち"},
+  {id:"m3",kind:"level",name:"中3レベル",desc:"経験・社会・少し抽象"},
+  {id:"h1",kind:"level",name:"高校基礎レベル",desc:"提供する・要求する・利用できる"},
+  {id:"h2",kind:"level",name:"高校標準レベル",desc:"評価する・維持する・有意な"},
+  {id:"aws", kind:"topic",name:"AWS・クラウド",  desc:"配置する・冗長性・遅延・上限枠"},
+  {id:"biz", kind:"topic",name:"ビジネス検討",  desc:"実現可能性・前提・成果物・得失"},
+  {id:"econ",kind:"topic",name:"経済ニュース",  desc:"物価・利回り・関税・利益率"},
+  {id:"art", kind:"topic",name:"アートの表現",  desc:"構図・質感・彩度・呼び起こす"},
+  {id:"car", kind:"topic",name:"車・運転",      desc:"操舵・排気量・空力・操縦性"},
 ];
 const WORDS=[
 // ===== 中1レベル =====
@@ -118,4 +125,79 @@ const WORDS=[
 {w:"assume",jp:"思い込む・前提とする",hook:"仮説マッピングのassumption（思い込み・仮定）の動詞形",ex:"I assumed he was right.",exjp:"彼が正しいと思い込んでいた。",deck:"h2"},
 {w:"affect",jp:"影響を与える",hook:"エフェクト（effect＝効果）の動詞側。「AがBにaffectする」",ex:"The weather affects my mood.",exjp:"天気は気分に影響する。",deck:"h2"},
 {w:"determine",jp:"決定する",hook:"ターミネーター＝終わらせる者。term（限界）を定める→決定",ex:"We determined the price.",exjp:"価格を決定した。",deck:"h2"},
+
+// ============================================================
+// ここから分野別（kind:"topic"）。レベル診断には混ぜない。
+// フックは「日本語の中に既にあるカタカナ」から繋げる方針。
+// ============================================================
+
+// ===== AWS・クラウド =====
+{w:"deploy",jp:"配置する・展開する",hook:"デプロイ。そのまま使っている言葉",ex:"We deploy the app to the cloud.",exjp:"アプリをクラウドへ展開する。",deck:"aws"},
+{w:"provision",jp:"用意する・払い出す",hook:"プロビジョニング。resourceを「あてがう」",ex:"We provision the servers automatically.",exjp:"サーバーを自動で払い出す。",deck:"aws"},
+{w:"redundancy",jp:"冗長性",hook:"リダンダント。同じものを2つ持って備えること",ex:"Redundancy prevents a single failure.",exjp:"冗長性が単一障害を防ぐ。",deck:"aws"},
+{w:"latency",jp:"遅延",hook:"レイテンシー。応答までの待ち時間",ex:"Low latency is important for users.",exjp:"利用者には低遅延が重要だ。",deck:"aws"},
+{w:"throughput",jp:"処理量",hook:"スループット。through（通り抜ける）put（置く）量",ex:"We measured the throughput per second.",exjp:"毎秒の処理量を測った。",deck:"aws"},
+{w:"outage",jp:"停止・障害",hook:"out（外れている）＋age（状態）。落ちている状態",ex:"The outage lasted two hours.",exjp:"障害は2時間続いた。",deck:"aws"},
+{w:"mitigate",jp:"緩和する",hook:"リスクを和らげる。mitigation は提案書に必ず出る",ex:"We mitigate the risk with backups.",exjp:"バックアップでリスクを緩和する。",deck:"aws"},
+{w:"compliance",jp:"法令順守",hook:"コンプライアンス。comply（従う）の名詞",ex:"The design meets compliance requirements.",exjp:"設計は法令順守の要件を満たす。",deck:"aws"},
+{w:"encrypt",jp:"暗号化する",hook:"crypt＝暗号。暗号通貨の crypto と同じ",ex:"We encrypt the data at rest.",exjp:"保存時にデータを暗号化する。",deck:"aws"},
+{w:"quota",jp:"上限枠",hook:"クォータ。割り当てられた量",ex:"We hit the service quota.",exjp:"サービスの上限枠に達した。",deck:"aws"},
+{w:"onboarding",jp:"導入・受け入れ",hook:"オンボーディング。board（船）に乗せる",ex:"Customer onboarding takes two weeks.",exjp:"顧客の受け入れには2週間かかる。",deck:"aws"},
+{w:"resilient",jp:"復元力のある",hook:"レジリエンス。折れても戻る強さ",ex:"The system is resilient to failure.",exjp:"そのシステムは障害に強い。",deck:"aws"},
+
+// ===== ビジネス検討 =====
+{w:"feasibility",jp:"実現可能性",hook:"フィジビリティスタディ。そもそもできるのか",ex:"We checked the feasibility first.",exjp:"まず実現可能性を確かめた。",deck:"biz"},
+{w:"stakeholder",jp:"関係者",hook:"ステークホルダー。stake（杭）を打っている人",ex:"We aligned with the stakeholders.",exjp:"関係者と認識を合わせた。",deck:"biz"},
+{w:"assumption",jp:"前提・仮定",hook:"assume（仮定する）の名詞。仮説マッピングで使う",ex:"The plan rests on one assumption.",exjp:"計画は1つの前提に乗っている。",deck:"biz"},
+{w:"baseline",jp:"基準線",hook:"ベースライン。導入する前に測っておく値",ex:"We measured the baseline before launch.",exjp:"開始前に基準線を測った。",deck:"biz"},
+{w:"procurement",jp:"調達",hook:"調達仕様書＝procurement document",ex:"The procurement process takes months.",exjp:"調達の手続きには数か月かかる。",deck:"biz"},
+{w:"deliverable",jp:"成果物",hook:"deliver（届ける）もの＝納品するもの",ex:"We listed every deliverable.",exjp:"成果物を全部書き出した。",deck:"biz"},
+{w:"scope",jp:"範囲",hook:"スコープ。見える範囲・やる範囲",ex:"We agreed on the project scope.",exjp:"案件の範囲に合意した。",deck:"biz"},
+{w:"constraint",jp:"制約",hook:"制約条件。締め付けて動ける幅を決めるもの",ex:"Budget is the main constraint.",exjp:"予算が主な制約だ。",deck:"biz"},
+{w:"rationale",jp:"根拠",hook:"rational（合理的）の名詞。なぜそうしたか",ex:"Please explain the rationale.",exjp:"根拠を説明してください。",deck:"biz"},
+{w:"tradeoff",jp:"得失・引き換え",hook:"トレードオフ。取引して何かを手放す",ex:"There is a tradeoff between cost and speed.",exjp:"費用と速さは引き換えになる。",deck:"biz"},
+{w:"prioritize",jp:"優先順位をつける",hook:"プライオリティ（priority）の動詞",ex:"We prioritize the top three issues.",exjp:"上位3つの課題を優先する。",deck:"biz"},
+{w:"validate",jp:"検証する",hook:"バリデーション。妥当かどうかを確かめる",ex:"We validate the hypothesis with users.",exjp:"利用者に当てて仮説を検証する。",deck:"biz"},
+
+// ===== 経済ニュース =====
+{w:"inflation",jp:"物価上昇",hook:"インフレ。inflate（膨らませる）の名詞",ex:"Inflation slowed last month.",exjp:"先月、物価上昇は鈍化した。",deck:"econ"},
+{w:"yield",jp:"利回り・生み出す",hook:"収穫量のyield。お金が生む量＝利回り",ex:"Bond yields rose sharply.",exjp:"債券の利回りが急上昇した。",deck:"econ"},
+{w:"recession",jp:"景気後退",hook:"リセッション。re（後ろへ）＋cede（進む）",ex:"The economy entered a recession.",exjp:"経済は景気後退に入った。",deck:"econ"},
+{w:"tariff",jp:"関税",hook:"タリフ。輸入品にかける税",ex:"New tariffs raised prices.",exjp:"新しい関税が価格を押し上げた。",deck:"econ"},
+{w:"revenue",jp:"売上",hook:"レベニュー。re（戻って）venue（来る）＝入ってくるお金",ex:"Revenue grew ten percent.",exjp:"売上が10%伸びた。",deck:"econ"},
+{w:"margin",jp:"利益率",hook:"マージン。余白＝手元に残る取り分",ex:"The margin shrank this quarter.",exjp:"今四半期は利益率が縮んだ。",deck:"econ"},
+{w:"forecast",jp:"予測する",hook:"フォーキャスト。fore（先に）cast（投げる）",ex:"They forecast slower growth.",exjp:"成長の鈍化を予測している。",deck:"econ"},
+{w:"surplus",jp:"黒字・余剰",hook:"sur（上に）plus（足す）＝余った分",ex:"The trade surplus widened.",exjp:"貿易黒字が拡大した。",deck:"econ"},
+{w:"deficit",jp:"赤字・不足",hook:"デフィシット。surplus の反対で足りない側",ex:"The budget deficit grew.",exjp:"財政赤字が拡大した。",deck:"econ"},
+{w:"merger",jp:"合併",hook:"merge（マージする）の名詞",ex:"The merger was approved.",exjp:"合併が承認された。",deck:"econ"},
+{w:"volatile",jp:"変動が激しい",hook:"ボラティリティ。飛びやすい・揺れやすい",ex:"The market was volatile.",exjp:"市場は変動が激しかった。",deck:"econ"},
+{w:"quarterly",jp:"四半期の",hook:"クォーター（4分の1）＝3か月ごと",ex:"Quarterly earnings beat estimates.",exjp:"四半期決算は予想を上回った。",deck:"econ"},
+
+// ===== アートの表現 =====
+{w:"composition",jp:"構図",hook:"コンポジション。compose（組み立てる）の名詞",ex:"The composition draws the eye.",exjp:"その構図が視線を引く。",deck:"art"},
+{w:"contrast",jp:"対比",hook:"コントラスト。明暗や色の差",ex:"The contrast is very strong.",exjp:"対比がとても強い。",deck:"art"},
+{w:"texture",jp:"質感",hook:"テクスチャ。表面の手ざわり",ex:"The texture looks rough.",exjp:"質感が粗く見える。",deck:"art"},
+{w:"hue",jp:"色合い",hook:"HSLのH。色そのものの方向",ex:"The hue shifts to blue.",exjp:"色合いが青へ寄る。",deck:"art"},
+{w:"saturation",jp:"彩度",hook:"サチュレーション。色の濃さ・飽和",ex:"Lower the saturation a little.",exjp:"彩度を少し下げて。",deck:"art"},
+{w:"depict",jp:"描く",hook:"picture（絵）と同じ語源。絵にする",ex:"The painting depicts a storm.",exjp:"その絵は嵐を描いている。",deck:"art"},
+{w:"figurative",jp:"具象の",hook:"figure（形・人の姿）の形容詞",ex:"His work is figurative, not abstract.",exjp:"彼の作品は抽象でなく具象だ。",deck:"art"},
+{w:"abstract",jp:"抽象的な",hook:"アブストラクト。形から離れている",ex:"The style is abstract.",exjp:"その様式は抽象的だ。",deck:"art"},
+{w:"perspective",jp:"遠近法・視点",hook:"パースをつける。見る位置",ex:"The perspective feels deep.",exjp:"遠近感が深く感じられる。",deck:"art"},
+{w:"render",jp:"描画する・表現する",hook:"レンダリング。光や色を絵にする",ex:"The light is rendered softly.",exjp:"光がやわらかく描かれている。",deck:"art"},
+{w:"evoke",jp:"呼び起こす",hook:"voice（声）と同語源。引き出す",ex:"The colors evoke calm.",exjp:"その色は静けさを呼び起こす。",deck:"art"},
+{w:"palette",jp:"色の組み合わせ",hook:"パレット。使う色の一式",ex:"The palette is limited to three colors.",exjp:"色数は3色に絞られている。",deck:"art"},
+
+// ===== 車・運転 =====
+{w:"steering",jp:"操舵・ハンドル操作",hook:"ステアリング。steer（舵を取る）",ex:"The steering feels light.",exjp:"ハンドルが軽く感じる。",deck:"car"},
+{w:"suspension",jp:"サスペンション",hook:"suspend（吊る）の名詞。車体を吊っている",ex:"The suspension absorbs bumps.",exjp:"サスが段差を吸収する。",deck:"car"},
+{w:"torque",jp:"トルク・回す力",hook:"トルク。加速の押し出す力",ex:"The engine has high torque.",exjp:"そのエンジンはトルクが太い。",deck:"car"},
+{w:"displacement",jp:"排気量",hook:"place（置く）を押しのける量",ex:"The engine displacement is two liters.",exjp:"排気量は2リッターだ。",deck:"car"},
+{w:"transmission",jp:"変速機",hook:"トランスミッション。transmit（伝える）",ex:"The transmission shifts smoothly.",exjp:"変速がなめらかだ。",deck:"car"},
+{w:"brake",jp:"ブレーキをかける",hook:"ブレーキ。名詞でも動詞でも使う",ex:"He braked hard before the corner.",exjp:"彼はコーナー手前で強くブレーキをかけた。",deck:"car"},
+{w:"mileage",jp:"走行距離・燃費",hook:"mile（マイル）＋age（量）",ex:"The car has low mileage.",exjp:"その車は走行距離が短い。",deck:"car"},
+{w:"exhaust",jp:"排気",hook:"エキゾースト。出し尽くす",ex:"The exhaust note is loud.",exjp:"排気音が大きい。",deck:"car"},
+{w:"chassis",jp:"車体・骨格",hook:"シャシー。骨組みの部分",ex:"The chassis is very rigid.",exjp:"車体がとても剛性が高い。",deck:"car"},
+{w:"handling",jp:"操縦性",hook:"ハンドリング。handle（扱う）の名詞",ex:"The handling is sharp.",exjp:"操縦性が鋭い。",deck:"car"},
+{w:"cornering",jp:"コーナリング",hook:"corner（角）を曲がること",ex:"Cornering is stable at speed.",exjp:"高速でも安定して曲がる。",deck:"car"},
+{w:"aerodynamics",jp:"空力",hook:"エアロ。air（空気）＋dynamics（力学）",ex:"Aerodynamics reduce drag.",exjp:"空力が抗力を減らす。",deck:"car"},
 ];

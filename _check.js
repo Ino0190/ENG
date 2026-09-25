@@ -19,10 +19,25 @@ for(const q of QUESTIONS){
   const set=new Set(q.o.map(s=>s.trim()));
   if(set.size!==q.o.length)errs.push("id"+q.id+": 選択肢に重複");
 }
-for(const u of UNITS)if((perUnit[u.id]||0)!==3)errs.push("unit "+u.id+": 問題数"+(perUnit[u.id]||0)+"（3であるべき）");
+// 基本(lv未指定=1)は単元ごと3問。追加(lv:2＝間違えたら解放)は 0問 か 2問
+const dLv1={},dLv2={};
+for(const q of QUESTIONS){
+  if((q.lv||1)===1)dLv1[q.u]=(dLv1[q.u]||0)+1;
+  else if(q.lv===2)dLv2[q.u]=(dLv2[q.u]||0)+1;
+  else errs.push("id"+q.id+": 未知のlv "+q.lv);
+}
+for(const u of UNITS){
+  if((dLv1[u.id]||0)!==3)errs.push("unit "+u.id+": 基本の問題数"+(dLv1[u.id]||0)+"（3であるべき）");
+  const n2=dLv2[u.id]||0;
+  if(n2!==0&&n2!==2)errs.push("unit "+u.id+": 追加の問題数"+n2+"（0か2であるべき）");
+}
 // 正解位置の偏りチェック（情報表示のみ・アプリ側で表示時シャッフルする）
 const dist=[0,0,0,0];QUESTIONS.forEach(q=>dist[q.a]++);
-console.log("単元数:",UNITS.length," 問題数:",QUESTIONS.length," 正解位置 A/B/C/D =",dist.join("/"));
+const nLv1=QUESTIONS.filter(q=>(q.lv||1)===1).length;
+const nLv2=QUESTIONS.filter(q=>q.lv===2).length;
+console.log("単元数:",UNITS.length," 問題数:",QUESTIONS.length,
+  "（診断"+nLv1+" ＋間違えたら解放"+nLv2+"／追加つき単元"+Object.keys(dLv2).length+"）",
+  " 正解位置 A/B/C/D =",dist.join("/"));
 
 // ===== words.js（単語amida） =====
 const wsrc=fs.readFileSync(path.join(__dirname,"words.js"),"utf8");

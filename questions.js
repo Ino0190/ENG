@@ -124,4 +124,62 @@ const QUESTIONS = [
 {id:70,u:"h1rel2",jp:"ここは私が生まれた町だ。",en:"This is the town ___ I was born.",o:["which","where","that","what"],a:1,why:"後ろの文（I was born）が完全な形→関係副詞where。whichを使うなら前置詞が要る（in which）。「後ろの文に穴があるか」で代名詞/副詞を見分ける。",elim:"A=whichだとI was born ___ の穴がなく繋がらない。C=thatも代名詞なので同じ理由でダメ。D=whatは先行詞を含む。"},
 {id:71,u:"h1rel2",jp:"これは私が住んでいた家だ。",en:"This is the house in ___ I lived.",o:["which","where","that","what"],a:0,why:"前置詞の直後に置けるのはwhichだけ。in where / in that は形として存在しない。",elim:"B=whereは前置詞を含んだ副詞なのでinと重複する。C=前置詞+thatは不可（関係代名詞の中で唯一の弱点）。D=whatは先行詞を含む。"},
 {id:72,u:"h1rel2",jp:"彼が遅刻した理由を知っていますか。",en:"Do you know the reason ___ he was late?",o:["why","which","where","how"],a:0,why:"先行詞the reason+完全な文→関係副詞why。the reason why 〜で「〜の理由」。",elim:"B=後ろの文に穴がないのでwhichは使えない。C=whereは場所。D=howはthe wayと一緒に使えない（the way howは×）逆に単独ならOK。"},
+
+// ============================================================
+// ここから lv:2 ＝ 追加の2問。
+// その単元で1問でも間違えると解放され、以後その単元は5問になる。
+// 誤答の選択肢には、実際に選んでしまった答えを入れている。
+// ============================================================
+
+// ===== 中1: 現在進行形（状態動詞を進行形にしてしまう） =====
+{id:101,u:"m1ing",lv:2,jp:"私は新しい車が欲しい。",en:"I ___ a new car.",o:["am wanting","want","wanting","am want"],a:1,why:"wantもknowと同じで、頭の中の状態を表す動詞。「欲しがっている」と訳せても進行形にしない。",elim:"A=wantは進行形にしない代表。C=〜ing単独では文にならない。D=be動詞と原形は並ばない。"},
+{id:102,u:"m1ing",lv:2,jp:"彼は車を2台持っている。",en:"He ___ two cars.",o:["is having","has","having","is have"],a:1,why:"have（持っている）も状態動詞なので進行形にしない。※「食事をする」のhaveは進行形にできる（is having lunch）。",elim:"A=「持っている」のhaveは進行形にしない。C=be動詞が抜けている。D=be動詞と原形は並ばない。"},
+
+// ===== 中2: 動名詞と不定詞（崩れの起点） =====
+{id:103,u:"m2ger",lv:2,jp:"彼は本を読み終えた。",en:"He finished ___ the book.",o:["to read","reading","read","reads"],a:1,why:"finishは「やったから終わる」。終えるには先にやっている必要があるので、もう手をつけた形のing。",elim:"A=finishのうしろにtoは付かない。C/D=動詞のままでは置けない。"},
+{id:104,u:"m2ger",lv:2,jp:"手伝ってくれてありがとう。",en:"Thank you for ___ me.",o:["to help","helping","help","helped"],a:1,why:"forのような前置詞のうしろはing。look forward to のように「toの前に単語がくっついている」形も同じ仲間。",elim:"A=前置詞のうしろにtoは置けない。C/D=動詞のままでは置けない。"},
+
+// ===== 中2: 比較 =====
+{id:105,u:"m2comp",lv:2,jp:"この本はあの本より面白い。",en:"This book is ___ than that one.",o:["interestinger","more interesting","most interesting","interesting"],a:1,why:"長い語（-ing/-ful/-ousなど）は-erを付けず、前にmoreを置く。",elim:"A=長い語にerは付けない。C=mostは3つ以上で一番のとき。D=thanがあるのに比較級になっていない。"},
+{id:106,u:"m2comp",lv:2,jp:"彼は私と同じくらい速く走る。",en:"He runs ___ fast as I do.",o:["as","more","than","very"],a:0,why:"「同じくらい」はas 〜 as。間に入る語は元の形（fast）のままで、比較級にしない。",elim:"B/C=比較級の形。D=veryは比較の形を作れない。"},
+
+// ===== 中2: 接続詞 =====
+{id:107,u:"m2conj",lv:2,jp:"彼が来たら始めます。",en:"We will start when he ___.",o:["will come","comes","came","is coming"],a:1,why:"「〜したら」を表すwhenの中は、未来のことでも現在形。ifと同じルール。",elim:"A=時・条件を表す節の中にwillは入れない。C=過去形では話が変わる。D=進行形にする必要がない。"},
+{id:108,u:"m2conj",lv:2,jp:"彼が忙しいことは知っている。",en:"I know ___ he is busy.",o:["that","if","what","which"],a:0,why:"「〜ということ」をひとまとめにするのはthat。省略もできる。",elim:"B=ifは「〜かどうか」。C/D=うしろの文に欠けがないので関係詞は使えない。"},
+
+// ===== 中3: 不定詞の応用 =====
+{id:109,u:"m3inf2",lv:2,jp:"部長は私に残るように言った。",en:"My boss told ___ late.",o:["me stay","me to stay","to me stay","me staying"],a:1,why:"tell・ask・wantは「人 + to + 動詞」。make・letのときだけtoが消える。",elim:"A=tellにはtoが必要。C=tellのうしろにtoは付けない。D=ingにはしない。"},
+{id:110,u:"m3inf2",lv:2,jp:"彼は疲れすぎて歩けなかった。",en:"He was ___ walk.",o:["too tired to","so tired to","too tired that","tired too to"],a:0,why:"too 〜 to … で「〜すぎて…できない」。notを使わずに打ち消しの意味になる。",elim:"B=so…thatの形ならthat節が必要。C=too…thatという形はない。D=語順が崩れている。"},
+
+// ===== 中3: 分詞の後置修飾 =====
+{id:111,u:"m3part",lv:2,jp:"これは日本で作られた車です。",en:"This is a car ___ in Japan.",o:["making","made","makes","is made"],a:1,why:"車は「作られた」側なので過去分詞。文の動詞はisなので、is madeにすると動詞が2つになる。",elim:"A=ingだと車が何かを作っていることになる。C=動詞のままでは飾れない。D=動詞が2つになる。"},
+{id:112,u:"m3part",lv:2,jp:"窓の近くに座っている女性は私の母です。",en:"The woman ___ near the window is my mother.",o:["who sits","sitting","sits","is sitting"],a:1,why:"文の動詞はis。「座っている」は女性を飾るだけなのでingを置く。",elim:"A=who sitsだと「いつも座る人」という意味になる。C/D=動詞が2つになる。"},
+
+// ===== 中3: 関係代名詞 =====
+{id:113,u:"m3rel",lv:2,jp:"私が昨日会った人は医者だ。",en:"The man ___ yesterday is a doctor.",o:["I met him","I met","which I met","what I met"],a:1,why:"会った相手（man）が前に出ているので、metのうしろにhimは置かない。thatやwhomは入れても省略してもよい。",elim:"A=目的語が二重になる。C=人にwhichは使わない。D=whatは先行詞と一緒に使えない。"},
+{id:114,u:"m3rel",lv:2,jp:"屋根が赤い家が私の家です。",en:"The house ___ roof is red is mine.",o:["which","whose","who","that"],a:1,why:"「家の屋根」は所有の関係なのでwhose。whoseのうしろには名詞（roof）が続くのが見分け方。",elim:"A/D=うしろに名詞が続く形では使えない。C=whoは人に使う。"},
+
+// ===== 中3: 間接疑問文 =====
+{id:115,u:"m3indq",lv:2,jp:"彼がどこに住んでいるか知っていますか。",en:"Do you know ___?",o:["where does he live","where he lives","where he live","where is he living"],a:1,why:"疑問文が文の一部になると、does he liveの語順がhe livesに戻る。",elim:"A=疑問文の語順のまま。C=三単現のsが抜けている。D=「住んでいる」に引かれて進行形にしている。"},
+{id:116,u:"m3indq",lv:2,jp:"彼が何を言ったか教えてください。",en:"Please tell me ___.",o:["what did he say","what he said","what he say","what was he saying"],a:1,why:"did he sayではなくhe said。過去形はそのまま動詞に残る。",elim:"A=疑問文の語順のまま。C=過去形になっていない。D=進行形にする必要がない。"},
+
+// ===== 高校: 過去完了・完了進行形 =====
+{id:117,u:"h1tense",lv:2,jp:"私が電話した時、彼はもう出かけていた。",en:"When I called, he ___.",o:["was already leaving","had already left","has already left","already left"],a:1,why:"過去の一点（電話した時）より前の話なので had + 過去分詞。",elim:"A=進行形だと「出かけている最中だった」。C=hasにすると基準が今になる。D=どちらが先かを示せない。"},
+{id:118,u:"h1tense",lv:2,jp:"彼は3年間ずっとここで働いている。",en:"He ___ here for three years.",o:["is working","has been working","was working","works"],a:1,why:"for three years＝期間が付いているので、前から今まで続いている形 have been + ing。",elim:"A=進行形だけでは期間を表せない。C=過去進行形は今と切れる。D=現在形は習慣を表す。"},
+
+// ===== 高校: 仮定法 =====
+{id:119,u:"h1subj",lv:2,jp:"もっと時間があれば手伝えるのに。",en:"If I ___ more time, I could help you.",o:["have","had","will have","would have"],a:1,why:"今は時間がないという前提なので、時間を1つ後ろにずらして過去形にする。",elim:"A=本当にあり得る話のときの形。C=if節にwillは入れない。D=would haveは過去のことを言う形。"},
+{id:120,u:"h1subj",lv:2,jp:"もっと早く出発していれば間に合ったのに。",en:"If we ___ earlier, we could have made it.",o:["left","had left","have left","would leave"],a:1,why:"過去にそうしなかった話なので had + 過去分詞。うしろが could have なのが合図。",elim:"A=1段しかずらしていない（今の話になる）。C=haveの形は今が基準。D=would leaveはこれからの話。"},
+
+// ===== 高校: 助動詞+have+過去分詞 =====
+{id:121,u:"h1auxp",lv:2,jp:"彼は鍵を忘れたのかもしれない。",en:"He ___ his key.",o:["may forget","may have forgotten","may forgot","may be forgotten"],a:1,why:"過去のことへの推量は 助動詞 + have + 過去分詞。",elim:"A=今のことになる。C=助動詞のうしろは原形。D=受け身になってしまう。"},
+{id:122,u:"h1auxp",lv:2,jp:"彼女はそれを知っていたはずだ。",en:"She ___ it.",o:["must know","must have known","must knew","must be known"],a:1,why:"「〜だったはずだ」は must have + 過去分詞。今のことなら must know。",elim:"A=今のことになる。C=助動詞のうしろは原形。D=受け身になってしまう。"},
+
+// ===== 高校: 分詞構文 =====
+{id:123,u:"h1partc",lv:2,jp:"公園を歩いていると、彼に会った。",en:"___ in the park, I met him.",o:["To walk","Walking","Walked","I walking"],a:1,why:"主語が同じ2つの文をまとめるとき、前の文の動詞をingにして繋げる。主語（I）は残さない。",elim:"A=toは「〜するために」。C=される側の形。D=主語は残さない。"},
+{id:124,u:"h1partc",lv:2,jp:"英語で書かれているので、私には読めなかった。",en:"___ in English, it was hard for me.",o:["Writing","Written","To write","It written"],a:1,why:"それは「書かれた」側なので過去分詞から始める。",elim:"A=ingだと「書きながら」になる。C=toは目的を表す。D=主語は残さない。"},
+
+// ===== 高校: 関係副詞・前置詞+関係代名詞 =====
+{id:125,u:"h1rel2",lv:2,jp:"これが私が働いている会社です。",en:"This is the company ___ I work.",o:["which","where","that","what"],a:1,why:"うしろのI workは主語も動詞も揃って欠けがない。だから場所を指すwhere。whichは主語か目的語が抜けていないと使えない。",elim:"A/C=うしろに欠けがないと使えない。D=whatは先行詞と一緒に使えない。"},
+{id:126,u:"h1rel2",lv:2,jp:"彼が生まれた日を覚えている。",en:"I remember the day ___ he was born.",o:["which","when","where","what"],a:1,why:"説明されるのが時（day）で、うしろの文に欠けがないのでwhen。",elim:"A=欠けがないと使えない。C=whereは場所。D=whatは先行詞と使えない。"},
 ];

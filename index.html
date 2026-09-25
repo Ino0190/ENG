@@ -16,8 +16,9 @@ html,body{background:var(--bg);color:var(--text);font-family:-apple-system,'Hira
 body{padding:0 0 60px;max-width:680px;margin:0 auto;min-height:100vh}
 
 header{position:sticky;top:0;z-index:10;background:rgba(15,20,32,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 16px}
-.hnav{display:flex;gap:8px;margin-top:10px;overflow-x:auto}
-.hnav a{flex:0 0 auto;color:var(--sub);font-size:14px;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px}
+.hnav{display:flex;gap:8px;margin-top:10px;overflow-x:auto;scrollbar-width:none}
+.hnav::-webkit-scrollbar{display:none}
+.hnav a{flex:0 0 auto;white-space:nowrap;color:var(--sub);font-size:14px;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px}
 .htop{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .htitle{font-size:16px;font-weight:700;color:var(--accent)}
 .hstat{font-size:14px;color:var(--sub)}
@@ -50,6 +51,9 @@ header{position:sticky;top:0;z-index:10;background:rgba(15,20,32,.95);backdrop-f
 .uchip{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;transition:.15s}
 .uchip:active{transform:scale(.98)}
 .uchip .un{flex:1}
+.uadd{display:inline-block;margin-left:7px;font-size:12px;font-weight:700;border-radius:5px;padding:1px 6px;
+  border:1px solid var(--line);color:var(--sub)}
+.uadd.on{border-color:var(--accent);color:var(--accent);background:rgba(241,196,15,.12)}
 .uchip .ud{font-size:13px;color:var(--sub);display:block}
 .uchip .us{font-size:14px;font-weight:700;flex:none}
 .uchip.st-ok{border-color:var(--ok)}
@@ -149,7 +153,7 @@ header{position:sticky;top:0;z-index:10;background:rgba(15,20,32,.95);backdrop-f
   </div>
   <div class="mapsec">
     <h2>文法マップ</h2>
-    <p class="mhint">単元をタップするとその3問だけ解ける（解き直しで色も更新）</p>
+    <p class="mhint">単元をタップするとその単元だけ解ける（解き直しで色も更新）。<b>一度間違えた単元は3問→5問に増える</b></p>
     <div class="legend"><span>◎ 3/3=分かってる</span><span>△ 2/3=怪しい</span><span>✕ 0〜1=崩れてる</span></div>
     <div id="map"></div>
   </div>
@@ -185,21 +189,52 @@ const KEY="engdrill_v1";
 let state=load()||{ans:{}};
 let queue=[],qi=0,mode=null,curUnit=null,runCorrect=0,lastRun=null;
 const byId={};QUESTIONS.forEach(q=>byId[q.id]=q);
-const unitQs={};UNITS.forEach(u=>unitQs[u.id]=QUESTIONS.filter(q=>q.u===u.id));
+// 基本3問（診断用・全単元）と、追加2問（lv:2＝その単元で間違えたら解放）
+const unitBase={},unitExtra={};
+UNITS.forEach(u=>{
+  unitBase[u.id]=QUESTIONS.filter(q=>q.u===u.id&&(q.lv||1)===1);
+  unitExtra[u.id]=QUESTIONS.filter(q=>q.u===u.id&&q.lv===2);
+});
+// その単元で1問でも間違えた履歴があれば追加を出す。
+// state.miss に累計で残すので、あとで解き直して正解にしても3問には戻らない（＝間違えた経歴は消えない）
+function unitOpened(uid){
+  if(state.miss&&state.miss[uid]>0)return true;
+  return QUESTIONS.some(q=>q.u===uid&&state.ans[q.id]&&!state.ans[q.id].ok);
+}
+function markMiss(uid){
+  state.miss=state.miss||{};
+  state.miss[uid]=(state.miss[uid]||0)+1;
+}
+// state.miss を持っていない古い記録は、いまの不正解から作っておく
+function migrateMiss(){
+  if(state.miss)return;
+  state.miss={};
+  QUESTIONS.forEach(q=>{
+    if(state.ans[q.id]&&!state.ans[q.id].ok)state.miss[q.u]=(state.miss[q.u]||0)+1;
+  });
+  save();
+}
+// いまその単元で出す問題（解放済みなら基本＋追加）
+function unitQsOf(uid){
+  return unitOpened(uid)?unitBase[uid].concat(unitExtra[uid]):unitBase[uid];
+}
+// 診断の分母は基本3問だけ（追加は診断の対象外）
+const DIAG_TOTAL=QUESTIONS.filter(q=>(q.lv||1)===1).length;
 
 function load(){try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return null}}
 // jumon.js の保険。localStorage から読めなくても、いま画面が持っている記録を渡せるようにする
 window.__jumonMem=function(){return {engdrill_v1:JSON.stringify(state)}};
 function save(){localStorage.setItem(KEY,JSON.stringify(state))}
 
+// 判定は「いま出している問題数」を分母にする（3問のままの単元も、解放して5問になった単元も同じ式で見る）
 function unitStatus(uid){
-  const qs=unitQs[uid],done=qs.filter(q=>q.id in state.ans);
-  if(done.length===0)return{st:"none",label:"—"};
+  const qs=unitQsOf(uid),n=qs.length,done=qs.filter(q=>q.id in state.ans);
+  if(done.length===0)return{st:"none",label:"—",n:n};
   const c=done.filter(q=>state.ans[q.id].ok).length;
-  if(done.length<qs.length)return{st:"none",label:done.length+"/"+qs.length+"問"};
-  if(c===3)return{st:"ok",label:"◎"};
-  if(c===2)return{st:"mid",label:"△ 2/3"};
-  return{st:"ng",label:"✕ "+c+"/3"};
+  if(done.length<n)return{st:"none",label:done.length+"/"+n+"問",n:n};
+  if(c===n)return{st:"ok",label:"◎",n:n};
+  if(c>=n-1)return{st:"mid",label:"△ "+c+"/"+n,n:n};
+  return{st:"ng",label:"✕ "+c+"/"+n,n:n};
 }
 function firstBreak(){
   let firstNg=null,firstMid=null,anyDone=false,allOk=true;
@@ -213,7 +248,8 @@ function firstBreak(){
   return{firstNg,firstMid,anyDone,allOk};
 }
 function renderHome(){
-  const answered=Object.keys(state.ans).length,total=QUESTIONS.length;
+  // 進捗は基本3問ぶんで数える（追加2問を足しても分母が動かないように）
+  const answered=QUESTIONS.filter(q=>(q.lv||1)===1&&(q.id in state.ans)).length,total=DIAG_TOTAL;
   document.getElementById("hstat").textContent="診断 "+answered+"/"+total;
   document.getElementById("hbar").style.width=(answered/total*100)+"%";
   // 崩れの起点バナー
@@ -241,7 +277,12 @@ function renderHome(){
     html+='<div class="grade"><h3>'+g+'</h3><div class="units">';
     for(const u of UNITS.filter(x=>x.g===g)){
       const s=unitStatus(u.id);
-      html+='<div class="uchip st-'+s.st+'" onclick="startUnit(\''+u.id+'\')"><span class="un">'+u.name+'<span class="ud">'+u.desc+'</span></span><span class="us">'+s.label+'</span></div>';
+      // 間違えた単元は追加2問が出て5問になる。まだ出ていない単元にはその予告を出す
+      const ex=unitExtra[u.id].length;
+      let note="";
+      if(ex&&unitOpened(u.id))note='<span class="uadd on">🔓 5問</span>';
+      else if(ex)note='<span class="uadd">＋'+ex+'問</span>';
+      html+='<div class="uchip st-'+s.st+'" onclick="startUnit(\''+u.id+'\')"><span class="un">'+u.name+note+'<span class="ud">'+u.desc+'</span></span><span class="us">'+s.label+'</span></div>';
     }
     html+='</div></div>';
   }
@@ -259,11 +300,12 @@ function startRun(ids,m,uid){
 }
 function startDiag(reset){
   if(reset){state.ans={};save();}
-  const ids=QUESTIONS.filter(q=>!(q.id in state.ans)).map(q=>q.id);
+  // 通しの診断は基本3問だけ。追加の2問は単元をタップしたときに出る
+  const ids=QUESTIONS.filter(q=>(q.lv||1)===1&&!(q.id in state.ans)).map(q=>q.id);
   if(!ids.length){goHome();return;}
   startRun(ids,"diag");
 }
-function startUnit(uid){startRun(unitQs[uid].map(q=>q.id),"unit",uid)}
+function startUnit(uid){startRun(unitQsOf(uid).map(q=>q.id),"unit",uid)}
 function startWrong(){startRun(QUESTIONS.filter(q=>state.ans[q.id]&&!state.ans[q.id].ok).map(q=>q.id),"wrong")}
 function retryRun(){if(lastRun)startRun(lastRun.ids,lastRun.m,lastRun.uid)}
 function resetAll(){if(confirm("診断の記録を全部消す？")){state.ans={};save();goHome();}}
@@ -290,7 +332,9 @@ function answer(i){
   if(answered)return;answered=true;
   const q=byId[queue[qi]],ok=i===q.a;
   if(ok)runCorrect++;
-  state.ans[q.id]={sel:i,ok};save();
+  state.ans[q.id]={sel:i,ok};
+  if(!ok)markMiss(q.u);        // 間違えた経歴を単元ごとに残す（追加2問の解放条件）
+  save();
   document.querySelectorAll(".opt").forEach(el=>{
     el.classList.add("disabled");el.onclick=null;
     const idx=+el.dataset.i;
@@ -381,6 +425,7 @@ function showToast(msg){
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>t.classList.remove("on"),2600);
 }
+migrateMiss();   // 古い記録に「間違えた単元」の情報を作ってから描く
 renderHome();
 // 解説ページの「▶ この単元をドリルで確認」から来た時（#u=単元id）はその単元を直接起動
 if(location.hash.startsWith("#u=")){
