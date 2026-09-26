@@ -42,6 +42,22 @@ header{position:sticky;top:0;z-index:10;background:rgba(15,20,32,.95);backdrop-f
 .breakbn.okbn b{color:var(--ok)}
 .breakbn.midbn{background:rgba(241,196,15,.1);border-color:var(--mid)}
 .breakbn.midbn b{color:var(--mid)}
+/* 入口ボタン（次にやることを1つだけ大きく出す） */
+.bignext{width:100%;background:var(--accent);border:none;color:#0f1420;border-radius:14px;
+  padding:18px 12px;font-size:19px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1.4}
+.bignext:active{transform:scale(.99)}
+.bigsub{width:100%;background:var(--card);border:1px solid var(--line);color:var(--text);
+  border-radius:12px;padding:14px 12px;font-size:16px;cursor:pointer;font-family:inherit;
+  text-align:left;margin-bottom:6px}
+.nexthint{font-size:14px;color:var(--sub);margin:8px 0 18px;line-height:1.6}
+/* 畳める箱。一覧は普段しまっておく */
+.fold{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:var(--card);overflow:hidden}
+.fold>summary{padding:14px 16px;font-size:16px;cursor:pointer;color:var(--sub);list-style:none}
+.fold>summary::-webkit-details-marker{display:none}
+.fold>summary::before{content:"▸ ";color:var(--accent)}
+.fold[open]>summary{border-bottom:1px solid var(--line);color:var(--text)}
+.fold[open]>summary::before{content:"▾ "}
+.fold>.foldbody{padding:14px 12px}
 .mapsec{margin-top:26px}
 .mapsec h2{font-size:19px;margin-bottom:4px}
 .mapsec p.mhint{font-size:14px;color:var(--sub);margin-bottom:14px}
@@ -117,50 +133,42 @@ header{position:sticky;top:0;z-index:10;background:rgba(15,20,32,.95);backdrop-f
 <script src="jumon.js"></script>
 </head>
 <body>
-<header>
-  <div class="htop">
-    <div class="htitle">英文法診断ドリル</div>
-    <div class="hstat" id="hstat"></div>
-  </div>
-  <div class="bar"><i id="hbar"></i></div>
-  <nav class="hnav"><a href="kanryo.html">⏳ 完了形</a><a href="saigakushu.html">🧱 再学習</a><a href="bunpo.html">📖 解説</a><a href="tango.html">🎴 単語</a><a href="#" onclick="Jumon.open();return false">📜 じゅもん</a></nav>
-  <div class="appverline"><button class="speakbtn" onclick="Speak.openPanel()">🔊 読み上げ</button> 版 <span class="appver">読み込み中</span></div>
-</header>
+<header id="apphdr" data-title="英文法診断ドリル" data-bar="1"></header>
+<!-- menu.js は header のあとに読む。ページ側のスクリプトが #hstat を触るので、先に作らせる -->
+<script src="menu.js"></script>
 
 <div class="screen home on" id="scr-home">
   <h1>どこから崩れてる？</h1>
   <p class="lead">中1→高校の順で文法を診断して、分からなくなり始めた単元を特定する。</p>
   <div id="breakpoint"></div>
-  <div class="modecard" onclick="startDiag(false)" id="mc-diag">
-    <h3>▶ 診断を進める</h3>
-    <p id="diagdesc">中1から順に1問ずつ。途中でやめても続きから再開できる。</p>
-  </div>
-  <div class="modecard" onclick="startWrong()" id="mc-wrong">
+
+  <!-- 入口は1つ -->
+  <button class="bignext" onclick="startDiag(false)" id="mc-diag">▶ 診断を進める</button>
+  <p class="nexthint" id="diagdesc">中1から順に1問ずつ。途中でやめても続きから再開できる。</p>
+
+  <div class="modecard" onclick="startWrong()" id="mc-wrong" style="display:none">
     <h3>🔥 間違えたやつだけ</h3>
     <p id="wrongdesc"></p>
   </div>
-  <div class="modecard" onclick="copyDiagPrompt()" id="mc-ai">
-    <h3>🤖 診断結果をAIに相談（コピー）</h3>
-    <p id="aidesc">単元別の結果と間違え方をまとめたプロンプトをコピー。KiroやClaudeに貼ると「何が分かってないか」を解説してもらえる。</p>
-  </div>
-  <div class="modecard" onclick="location.href='bunpo.html'">
-    <h3>📖 用語なし解説</h3>
-    <p>不定詞・分詞構文などの用語を使わずに全39単元を説明。用語は「翻訳表」で対応。</p>
-  </div>
-  <div class="modecard" onclick="location.href='tango.html'">
-    <h3>🎴 英単語 どっち</h3>
-    <p>中1→高校のレベル別サンプルで、単語も「どの帯から崩れてるか」を診断。間違えた単語は3回連続正解するまで出てくる。</p>
-  </div>
-  <div class="mapsec">
-    <h2>文法マップ</h2>
-    <p class="mhint">単元をタップするとその単元だけ解ける（解き直しで色も更新）。<b>一度間違えた単元は3問→5問に増える</b></p>
-    <div class="legend"><span>◎ 3/3=分かってる</span><span>△ 2/3=怪しい</span><span>✕ 0〜1=崩れてる</span></div>
-    <div id="map"></div>
-  </div>
-  <div class="modecard" onclick="resetAll()" style="margin-top:20px">
-    <h3>🗑 記録をリセット</h3>
-    <p>診断をまっさらからやり直す</p>
-  </div>
+
+  <details class="fold" id="fold-map">
+    <summary>文法マップ（39単元・<span id="mapsum"></span>）</summary>
+    <div class="foldbody">
+      <p class="mhint">単元をタップするとその単元だけ解ける（解き直しで色も更新）。<b>一度間違えた単元は3問→5問に増える</b></p>
+      <div class="legend"><span>◎ 3/3=分かってる</span><span>△ 2/3=怪しい</span><span>✕ 0〜1=崩れてる</span></div>
+      <div id="map"></div>
+    </div>
+  </details>
+
+  <details class="fold">
+    <summary>そのほか</summary>
+    <div class="foldbody">
+      <button class="bigsub" onclick="copyDiagPrompt()" id="mc-ai">🤖 診断結果をAIに相談（コピー）</button>
+      <p class="nexthint" id="aidesc">単元別の結果と間違え方をまとめた依頼文をコピーする。貼ると「何が分かってないか」を解説してもらえる。</p>
+      <button class="bigsub" onclick="location.href='bunpo.html'">📖 用語なし解説（39単元・用語ゼロ）</button>
+      <button class="bigsub" onclick="location.href='tango.html'">🎴 英単語 どっち（188語）</button>
+    </div>
+  </details>
 </div>
 
 <div class="screen" id="scr-quiz">
@@ -262,14 +270,19 @@ function renderHome(){
   }else if(b.allOk&&answered===total){
     bp.innerHTML='<div class="breakbn okbn">🎉 <b>全単元◎</b>。中学〜高校の基礎文法は崩れていない。</div>';
   }else{bp.innerHTML="";}
-  // 診断ボタンの文言
+  // 入口ボタン（残りがゼロなら「間違えたやつ」か解き直しに振る）
   const remain=total-answered;
-  document.getElementById("diagdesc").textContent=remain===0?"全問回答済み。マップの単元タップで解き直せる。":(answered===0?"中1から順に1問ずつ。途中でやめても続きから再開できる。":"続きから（残り"+remain+"問）");
-  // 間違えたやつ
+  const nb=document.getElementById("mc-diag");
+  nb.textContent=remain===0?"▶ 解き直す":(answered===0?"▶ 診断を始める（"+total+"問）":"▶ 診断を続ける（残り"+remain+"問）");
+  document.getElementById("diagdesc").textContent=remain===0?"全問回答済み。マップから単元を選ぶと解き直せる。":(answered===0?"中1から順に1問ずつ。途中でやめても続きから再開できる。":"1問ずつ。やめたところから戻れる。");
+  // 間違えたやつ（0件なら出さない）
   const wrong=QUESTIONS.filter(q=>state.ans[q.id]&&!state.ans[q.id].ok);
-  document.getElementById("wrongdesc").textContent=wrong.length?wrong.length+"問。正解すると記録が上書きされてマップも更新される。":"今はゼロ。";
-  document.getElementById("mc-wrong").classList.toggle("dim",!wrong.length);
+  document.getElementById("mc-wrong").style.display=wrong.length?"block":"none";
+  document.getElementById("wrongdesc").textContent=wrong.length+"問。正解すると記録が上書きされてマップも更新される。";
   document.getElementById("mc-ai").classList.toggle("dim",!answered);
+  // マップの要約（畳んだままでも進み具合が見える）
+  const ok=UNITS.filter(u=>unitStatus(u.id).st==="ok").length;
+  document.getElementById("mapsum").textContent="◎ "+ok+"/"+UNITS.length;
   // マップ
   const grades=[...new Set(UNITS.map(u=>u.g))];
   let html="";
@@ -309,6 +322,7 @@ function startUnit(uid){startRun(unitQsOf(uid).map(q=>q.id),"unit",uid)}
 function startWrong(){startRun(QUESTIONS.filter(q=>state.ans[q.id]&&!state.ans[q.id].ok).map(q=>q.id),"wrong")}
 function retryRun(){if(lastRun)startRun(lastRun.ids,lastRun.m,lastRun.uid)}
 function resetAll(){if(confirm("診断の記録を全部消す？")){state.ans={};save();goHome();}}
+window.__resetAll=resetAll;   // ☰ メニューから呼ぶ
 
 function showQ(){
   const q=byId[queue[qi]];

@@ -23,6 +23,20 @@ header{position:sticky;top:0;z-index:10;background:rgba(15,20,32,.95);backdrop-f
 .screen.on{display:block}
 h1{font-size:24px;line-height:1.4;margin-bottom:6px}
 p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
+/* 入口ボタン（次にやることを1つだけ大きく出す） */
+.bignext{width:100%;background:var(--accent);border:none;color:#0f1420;border-radius:14px;
+  padding:18px 12px;font-size:19px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1.4}
+.bignext:active{transform:scale(.99)}
+.nexthint{font-size:14px;color:var(--sub);margin:8px 0 18px;line-height:1.6}
+/* 畳める箱。一覧は普段しまっておく */
+.fold{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:var(--card);overflow:hidden}
+.fold>summary{padding:14px 16px;font-size:16px;cursor:pointer;color:var(--sub);list-style:none}
+.fold>summary::-webkit-details-marker{display:none}
+.fold>summary::before{content:"▸ ";color:var(--accent)}
+.fold[open]>summary{border-bottom:1px solid var(--line);color:var(--text)}
+.fold[open]>summary::before{content:"▾ "}
+.fold>.foldbody{padding:14px 12px}
+.fold .foldbody>.bigbtn{margin-bottom:8px}
 .modes{display:flex;gap:10px;margin-bottom:18px}
 .mode{flex:1;background:var(--accent);border:none;color:#0f1420;border-radius:12px;padding:14px 8px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}
 .mode.sub{background:var(--card);color:var(--text);border:1px solid var(--line)}
@@ -113,27 +127,34 @@ p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
 .result .rbtn.main{background:var(--accent);border-color:var(--accent);color:#0f1420}
 </style>
 <body>
-<header>
-  <div class="htitle">⏳ 現在完了</div>
-  <nav class="hnav"><a href="index.html">▶ 診断</a><a href="saigakushu.html">🧱 再学習</a><a href="bunpo.html">📖 解説</a><a href="#" onclick="Jumon.open();return false">📜 じゅもん</a></nav>
-  <div class="appverline"><button class="speakbtn" onclick="Speak.openPanel()">🔊 読み上げ</button> 版 <span class="appver">読み込み中</span></div>
-</header>
+<header id="apphdr" data-title="⏳ 現在完了"></header>
+<script src="menu.js"></script>
 
 <div class="screen on" id="scr-home">
   <h1>型で見分けて、文で覚える</h1>
   <p class="lead">日本語の「〜している／していた」は英語で8つに分かれる。どの型かを見分けられれば全部解ける。文はそのまま覚えて使える形にしてある。</p>
-  <div class="modes">
-    <button class="mode" onclick="startLearn(null)">📖 覚える（40文）</button>
-    <button class="mode sub" onclick="startQuiz(null)">✏️ 試す（40問）</button>
-  </div>
-  <button class="bigbtn sub" onclick="show('scr-chart')">🔍 見分け方の早見表</button>
-  <div id="types"></div>
-  <div class="deck" onclick="startQuiz('need')" id="deck-need" style="border-color:var(--ng)">
+  <!-- 入口は1つ -->
+  <button class="bignext" onclick="startNext()" id="btn-next">▶ 続ける</button>
+  <p class="nexthint" id="nexthint"></p>
+
+  <div class="deck" onclick="startQuiz('need')" id="deck-need" style="border-color:var(--ng);display:none">
     <div><h3>🔁 まだ覚えてないやつだけ</h3><p class="cue" id="needdesc"></p></div>
   </div>
-  <div class="deck" onclick="resetAll()">
-    <div><h3>🗑 記録をリセット</h3><p class="cue">言えた記録と定着記録を全部消す</p></div>
-  </div>
+
+  <details class="fold" id="fold-types">
+    <summary>型ごとにやる（8つ・<span id="typesum"></span>）</summary>
+    <div class="foldbody"><div id="types"></div></div>
+  </details>
+
+  <details class="fold">
+    <summary>そのほか</summary>
+    <div class="foldbody">
+      <button class="bigbtn sub" onclick="show('scr-chart')">🔍 見分け方の早見表</button>
+      <button class="bigbtn sub" onclick="startLearn(null)">📖 全部まとめて覚える（40文）</button>
+      <button class="bigbtn sub" onclick="startQuiz(null)">✏️ 全部まとめて試す（40問）</button>
+    </div>
+  </details>
+
 </div>
 
 <div class="screen" id="scr-learn">
@@ -225,8 +246,43 @@ function renderHome(){
       +'<div class="cue">合図: '+t.cue+'</div>'+badge+'</div>'
       +'<div class="stat"><div class="'+cls+'">言えた '+sc+'/'+ss.length+'</div></div></div>';
   }).join("");
+  // 定着待ち（0件なら出さない）
   const nd=KSENTS.filter(s=>need[s.id]>0).length;
-  document.getElementById("needdesc").textContent=nd?nd+"文が定着待ち。3回連続で正解すると消える。":"今はゼロ。4択で間違えるとここに溜まる。";
+  document.getElementById("deck-need").style.display=nd?"flex":"none";
+  document.getElementById("needdesc").textContent=nd+"文が定着待ち。3回連続で正解すると消える。";
+  const doneAll=KSENTS.filter(s=>said[s.id]===1).length;
+  document.getElementById("typesum").textContent="言えた "+doneAll+"/"+KSENTS.length;
+  renderNext();
+}
+
+// ===== 次にやること =====
+// ①定着待ち ②まだ言えていない型のうち先頭 ③全部できたら四択
+function renderNext(){
+  const btn=document.getElementById("btn-next"),hint=document.getElementById("nexthint");
+  const nd=KSENTS.filter(s=>need[s.id]>0).length;
+  if(nd){
+    btn.textContent="▶ 定着待ちの"+nd+"文をやる";
+    hint.textContent="3回続けて正解すると消える。ここを空にするのが先。";
+    btn.dataset.go="need";return;
+  }
+  for(const t of KTYPES){
+    const ss=sentsOf(t.id);
+    if(ss.some(s=>said[s.id]!==1)){
+      const done=ss.filter(s=>said[s.id]===1).length;
+      btn.textContent="▶ "+t.name+"（"+done+"/"+ss.length+"）";
+      hint.textContent=t.form+"　合図: "+t.cue;
+      btn.dataset.go=t.id;return;
+    }
+  }
+  btn.textContent="✏️ 全部を試す（"+KSENTS.length+"問）";
+  hint.textContent="8つの型ぜんぶ言えた状態。四択で抜けを探す。";
+  btn.dataset.go="quizall";
+}
+function startNext(){
+  const go=document.getElementById("btn-next").dataset.go;
+  if(go==="need")startQuiz("need");
+  else if(go==="quizall")startQuiz(null);
+  else startLearn(go);
 }
 function renderChart(){
   const flow='<div class="flow"><h3>上から順に当てはめる</h3><ol>'
@@ -252,6 +308,7 @@ function renderChart(){
 function resetAll(){
   if(confirm("言えた記録と定着記録を全部消す？")){said={};need={};save();goHome();}
 }
+window.__resetAll=resetAll;   // ☰ メニューから呼ぶ
 </script>
 <script>
 // ===== 覚えるモード: 日本語を見て英語で言う → 答え合わせ → 言えた/言えなかった =====

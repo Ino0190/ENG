@@ -27,6 +27,19 @@ p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
 .deck:active{transform:scale(.98)}
 .secttl{font-size:19px;color:var(--accent);margin:26px 0 4px}
 .sectlead{font-size:14px;color:var(--sub);line-height:1.7;margin-bottom:12px}
+/* 入口ボタン（次にやることを1つだけ大きく出す） */
+.bignext{width:100%;background:var(--accent);border:none;color:#0f1420;border-radius:14px;
+  padding:18px 12px;font-size:19px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1.4}
+.bignext:active{transform:scale(.99)}
+.nexthint{font-size:14px;color:var(--sub);margin:8px 0 18px;line-height:1.6}
+/* 畳める箱。一覧は普段しまっておく */
+.fold{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:var(--card);overflow:hidden}
+.fold>summary{padding:14px 16px;font-size:16px;cursor:pointer;color:var(--sub);list-style:none}
+.fold>summary::-webkit-details-marker{display:none}
+.fold>summary::before{content:"▸ ";color:var(--accent)}
+.fold[open]>summary{border-bottom:1px solid var(--line);color:var(--text)}
+.fold[open]>summary::before{content:"▾ "}
+.fold>.foldbody{padding:14px 12px}
 .deck h3{font-size:17px;margin-bottom:2px}
 .deck p{font-size:14px;color:var(--sub)}
 .deck .stat{flex:none;text-align:right;font-size:14px;color:var(--sub)}
@@ -76,29 +89,46 @@ p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
 <script src="jumon.js"></script>
 </head>
 <body>
-<header>
-  <div class="htitle">🎴 英単語 どっち</div>
-  <nav class="hnav"><a href="index.html">▶ ドリル</a><a href="kanryo.html">⏳ 完了形</a><a href="saigakushu.html">🧱 再学習</a><a href="bunpo.html">📖 解説</a><a href="#" onclick="Jumon.open();return false">📜 じゅもん</a></nav>
-  <div class="appverline">版 <span class="appver">読み込み中</span></div>
-</header>
+<header id="apphdr" data-title="🎴 英単語 どっち"></header>
+<script src="menu.js"></script>
 
 <div class="screen on" id="scr-home">
   <h1>繰り返しで覚える</h1>
-  <p class="lead">2択で10秒判定、間違えた単語は<b>3回連続で正解するまで</b>出てくる。<b>レベル別</b>は初見の正答率で「どの帯から崩れてるか」が分かる。<b>仕事・趣味</b>と<b>語と語の組み合わせ</b>は下にある。</p>
+  <p class="lead">2択で10秒判定。間違えた単語は<b>3回連続で正解するまで</b>出てくる。</p>
   <div id="wordbreak"></div>
-  <div id="decks"></div>
-  <h2 class="secttl">仕事・趣味で使う単語</h2>
-  <p class="sectlead">レベルの順番ではないので、崩れの起点の判定には入れていない。必要なところから取っていい。</p>
-  <div id="topicdecks"></div>
-  <h2 class="secttl">語と語の組み合わせ</h2>
-  <p class="sectlead">文法が合っていても組み合わせを外すと不自然になる帯。<b>日本語から直訳すると選んでしまう方</b>を誤答に置いてある（決定を do / 〜について discuss about）。日本語だけ出るので、英語を思い出して選ぶ。</p>
-  <div id="coldecks"></div>
-  <div class="deck" onclick="startNeed()" id="deck-need" style="border-color:var(--ng)">
+
+  <!-- 入口は1つ -->
+  <button class="bignext" onclick="startNext()" id="btn-next">▶ 続ける</button>
+  <p class="nexthint" id="nexthint"></p>
+
+  <div class="deck" onclick="startNeed()" id="deck-need" style="border-color:var(--ng);display:none">
     <div><h3>🔁 まだ覚えてないやつだけ</h3><p id="needdesc"></p></div>
   </div>
-  <div class="deck" onclick="resetAll()">
-    <div><h3>🗑 記録をリセット</h3><p>覚えた記録を全部消す</p></div>
-  </div>
+
+  <details class="fold" id="fold-level">
+    <summary>レベル別で崩れを測る（5つ・<span id="lvsum"></span>）</summary>
+    <div class="foldbody">
+      <p class="sectlead">中1→高校の順に並んでいる。初見の正答率が70%を切った帯が「崩れの起点」。</p>
+      <div id="decks"></div>
+    </div>
+  </details>
+
+  <details class="fold">
+    <summary>仕事・趣味で使う単語（5つ・60語）</summary>
+    <div class="foldbody">
+      <p class="sectlead">レベルの順番ではないので、崩れの起点の判定には入れていない。必要なところから取っていい。</p>
+      <div id="topicdecks"></div>
+    </div>
+  </details>
+
+  <details class="fold">
+    <summary>語と語の組み合わせ（2つ・24組）</summary>
+    <div class="foldbody">
+      <p class="sectlead">文法が合っていても組み合わせを外すと不自然になる帯。<b>日本語から直訳すると選んでしまう方</b>を誤答に置いてある（決定を do / 〜について discuss about）。日本語だけ出るので、英語を思い出して選ぶ。</p>
+      <div id="coldecks"></div>
+    </div>
+  </details>
+
 </div>
 
 <div class="screen" id="scr-quiz">
@@ -190,12 +220,57 @@ function renderHome(){
   document.getElementById("decks").innerHTML=levelDecks().map(deckHtml).join("");
   document.getElementById("topicdecks").innerHTML=topicDecks().map(deckHtml).join("");
   document.getElementById("coldecks").innerHTML=colDecks().map(deckHtml).join("");
+  // 定着待ち（0件なら出さない）
   const needWords=WORDS.filter(w=>need[w.w]>0);
-  document.getElementById("needdesc").textContent=needWords.length?needWords.length+"語が定着待ち。3回連続正解で消える。":"今はゼロ。デッキで間違えるとここに溜まる。";
+  document.getElementById("deck-need").style.display=needWords.length?"flex":"none";
+  document.getElementById("needdesc").textContent=needWords.length+"語が定着待ち。3回連続正解で消える。";
+  // レベルの要約（畳んだままでも進み具合が見える）
+  const lvTried=levelDecks().reduce((a,d)=>a+deckDiag(d.id).tried,0);
+  const lvAll=levelDecks().reduce((a,d)=>a+WORDS.filter(w=>w.deck===d.id).length,0);
+  document.getElementById("lvsum").textContent="測った "+lvTried+"/"+lvAll;
+  renderNext();
+}
+
+// ===== 次にやること =====
+// ①定着待ちがあればそれ ②まだ測っていないレベルの帯 ③崩れの起点の帯 ④分野別
+function renderNext(){
+  const btn=document.getElementById("btn-next"),hint=document.getElementById("nexthint");
+  const needWords=WORDS.filter(w=>need[w.w]>0);
+  if(needWords.length){
+    btn.textContent="▶ 定着待ちの"+needWords.length+"語をやる";
+    hint.textContent="3回続けて正解すると消える。ここを空にするのが先。";
+    btn.dataset.go="need";return;
+  }
+  // 初見をまだ測っていないレベルの帯
+  for(const d of levelDecks()){
+    const g=deckDiag(d.id);
+    if(g.tried<g.n){
+      btn.textContent="▶ "+d.name+"（"+g.tried+"/"+g.n+"）";
+      hint.textContent="初見の正答率を測っている途中。ここが終わると崩れの起点が出る。";
+      btn.dataset.go=d.id;return;
+    }
+  }
+  // 全部測ったら、70%を切った最初の帯
+  for(const d of levelDecks()){
+    const g=deckDiag(d.id);
+    if(g.rate!==null&&g.rate<0.7){
+      btn.textContent="▶ "+d.name+" を固める";
+      hint.textContent="初見の正答率が"+Math.round(g.rate*100)+"%。ここが崩れの起点。";
+      btn.dataset.go=d.id;return;
+    }
+  }
+  btn.textContent="▶ 語と語の組み合わせをやる";
+  hint.textContent="レベル別は崩れていない。次は組み合わせ（make a decision 型）。";
+  btn.dataset.go="col-vn";
+}
+function startNext(){
+  const go=document.getElementById("btn-next").dataset.go;
+  if(go==="need")startNeed();else startDeck(go);
 }
 function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));document.getElementById(id).classList.add("on")}
 function goHome(){renderHome();show("scr-home")}
 function resetAll(){if(confirm("覚えた記録と診断を全部消す？")){need={};saveNeed();first={};saveFirst();goHome();}}
+window.__resetAll=resetAll;   // ☰ メニューから呼ぶ
 
 function startDeck(did){
   curDeck=did;

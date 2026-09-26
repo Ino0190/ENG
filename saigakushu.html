@@ -24,6 +24,20 @@ header{position:sticky;top:0;z-index:10;background:rgba(15,20,32,.95);backdrop-f
 h1{font-size:24px;line-height:1.4;margin-bottom:6px}
 p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
 .modes{display:flex;gap:10px;margin-bottom:18px}
+/* 入口ボタン（次にやることを1つだけ大きく出す） */
+.mode.go{width:100%;margin-bottom:14px;padding:18px 12px;font-size:18px;line-height:1.4}
+/* 畳める箱。一覧は普段しまっておく */
+.fold{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:var(--card);overflow:hidden}
+.fold>summary{padding:14px 16px;font-size:16px;cursor:pointer;color:var(--sub);list-style:none}
+.fold>summary::-webkit-details-marker{display:none}
+.fold>summary::before{content:"▸ ";color:var(--accent)}
+.fold[open]>summary{border-bottom:1px solid var(--line);color:var(--text)}
+.fold[open]>summary::before{content:"▾ "}
+.fold>#types,.fold>.foldbody{padding:14px 12px}
+.fold .foldbody>.bigbtn{margin-bottom:8px}
+.fold.sub{background:transparent;margin-bottom:18px}
+.fold.sub>summary{padding:10px 12px;font-size:15px}
+.fold.sub>.foldbody{padding:12px 0 0}
 .mode{flex:1;background:var(--accent);border:none;color:#0f1420;border-radius:12px;padding:14px 8px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}
 .mode.sub{background:var(--card);color:var(--text);border:1px solid var(--line)}
 .deck{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:.15s;display:flex;justify-content:space-between;align-items:center;gap:10px}
@@ -138,40 +152,42 @@ details.jinv summary{cursor:pointer;font-size:14px;color:var(--blue);font-weight
 .result .rbtn.main{background:var(--accent);border-color:var(--accent);color:#0f1420}
 </style>
 <body>
-<header>
-  <div class="htitle">🧱 再学習</div>
-  <nav class="hnav"><a href="index.html">▶ 診断</a><a href="kanryo.html">⏳ 完了形</a><a href="bunpo.html">📖 解説</a><a href="#" onclick="Jumon.open();return false">📜 じゅもん</a></nav>
-</header>
-<div class="appverline"><button class="speakbtn" onclick="Speak.openPanel()">🔊 読み上げ</button> 版 <span class="appver">読み込み中</span></div>
+<header id="apphdr" data-title="🧱 再学習"></header>
+<script src="menu.js"></script>
 
 <div class="screen on" id="scr-home">
   <h1>現在完了の次から高校まで</h1>
-  <p class="lead">診断の起点だった現在完了は「⏳ 完了形」が担当。ここはその続きを4つのステージで登り直す。上のステージが下の土台になっているので、順番にやるのが速い。</p>
-  <div class="modes">
-    <button class="mode" id="btn-all-learn" onclick="startLearn(null)">📖 覚える</button>
-    <button class="mode sub" id="btn-all-quiz" onclick="startQuiz(null)">✏️ 試す</button>
-  </div>
+  <p class="lead" id="homelead"></p>
+
+  <!-- 入口は1つ。次にやるステージを自動で選ぶ -->
+  <button class="mode go" id="btn-next" onclick="startNext()">▶ 続ける</button>
+
   <div class="deck" onclick="startLearn('key')" id="deck-key" style="border-color:var(--blue)">
     <div><h3>🗣 暗唱セット（20文）</h3><p class="cue" id="keydesc"></p></div>
     <div class="stat"><div class="m" id="keystat"></div></div>
   </div>
-  <button class="bigbtn sub" onclick="show('scr-chart')">🔍 ステージごとの見分け方</button>
-  <div id="types"></div>
   <div class="deck" onclick="startQuiz('miss')" id="deck-weak" style="border-color:var(--accent);display:none">
     <div><h3>🎯 間違えた型だけ（多めに出す）</h3><p class="cue" id="weakdesc"></p></div>
   </div>
-  <div class="deck" onclick="copyPromptMiss()" id="deck-aimiss" style="border-color:var(--blue);display:none">
-    <div><h3>🤖 間違えた型の例文をAIに頼む</h3><p class="cue" id="aimissdesc"></p></div>
-  </div>
-  <div class="deck" onclick="startQuiz('need')" id="deck-need" style="border-color:var(--ng)">
+  <div class="deck" onclick="startQuiz('need')" id="deck-need" style="border-color:var(--ng);display:none">
     <div><h3>🔁 まだ覚えてないやつだけ</h3><p class="cue" id="needdesc"></p></div>
   </div>
-  <div class="deck" onclick="Jumon.open()" id="deck-jumon">
-    <div><h3>📜 ふっかつのじゅもん</h3><p class="cue">パソコンとスマホで進捗を持ち運ぶ（どのページからでも開ける）</p></div>
-  </div>
-  <div class="deck" onclick="resetAll()">
-    <div><h3>🗑 記録をリセット</h3><p class="cue">言えた記録・定着記録・間違えた型の記録を全部消す（追加の文も出なくなる）</p></div>
-  </div>
+
+  <details class="fold" id="fold-stages">
+    <summary>ステージを選ぶ（6つ・<span id="stagesum"></span>）</summary>
+    <div id="types"></div>
+  </details>
+
+  <details class="fold">
+    <summary>そのほか</summary>
+    <div class="foldbody">
+      <button class="bigbtn sub" onclick="show('scr-chart')">🔍 ステージごとの見分け方</button>
+      <button class="bigbtn sub" id="btn-all-learn" onclick="startLearn(null)">📖 全部まとめて覚える</button>
+      <button class="bigbtn sub" id="btn-all-quiz" onclick="startQuiz(null)">✏️ 全部まとめて試す</button>
+      <button class="bigbtn sub" id="btn-aimiss" onclick="copyPromptMiss()" style="display:none">🤖 間違えた型の例文をAIに頼む</button>
+    </div>
+  </details>
+
 </div>
 
 <div class="screen" id="scr-learn">
@@ -291,6 +307,8 @@ function renderHome(){
       +'<p>'+stg.lead+'</p><div class="go">'
       +'<button onclick="startLearn(\'s:'+stg.id+'\')">📖 このステージを覚える</button>'
       +'<button onclick="startQuiz(\'s:'+stg.id+'\')">✏️ 試す</button></div></div>';
+    // 型ごとのカードは畳んでおく。ステージ6つ分を開くと20枚が並んで読めなくなる
+    const tn=typesOfStage(stg.id).length;
     const decks=typesOfStage(stg.id).map(t=>{
       const ss=sentsOf(t.id);
       const sc=ss.filter(s=>said[s.id]===1).length;
@@ -306,10 +324,14 @@ function renderHome(){
         +'<div class="cue">合図: '+t.cue+'</div>'+badge+'</div>'
         +'<div class="stat"><div class="'+cls+'">言えた '+sc+'/'+ss.length+'</div></div></div>';
     }).join("");
-    return head+decks;
+    return head+'<details class="fold sub"><summary>型ごとにやる（'+tn+'つ）</summary>'
+      +'<div class="foldbody">'+decks+'</div></details>';
   }).join("");
+  // 定着待ち（0件なら出さない）
   const nd=SSENTS.filter(s=>need[s.id]>0).length;
-  document.getElementById("needdesc").textContent=nd?nd+"文が定着待ち。3回連続で正解すると消える。":"今はゼロ。4択で間違えるとここに溜まる。";
+  const ndeck=document.getElementById("deck-need");
+  ndeck.style.display=nd?"flex":"none";
+  document.getElementById("needdesc").textContent=nd+"文が定着待ち。3回連続で正解すると消える。";
   // 間違えた型だけ（追加ぶんも全部）
   const weakT=STYPES.filter(t=>unlocked(t.id));
   const weakN=sentsOf("miss").length;
@@ -317,20 +339,66 @@ function renderHome(){
   wd.style.display=weakT.length?"flex":"none";
   document.getElementById("weakdesc").textContent=
     weakT.length+"つの型で間違えている。追加ぶんを含めて "+weakN+"文（"+weakT.map(t=>t.name).join("・")+"）";
-  const ad=document.getElementById("deck-aimiss");
-  ad.style.display=weakT.length?"flex":"none";
-  document.getElementById("aimissdesc").textContent=
-    weakT.length+"つの型ぶんの依頼文をコピーする（各5文）。貼り付ければ手元で練習できる例文が返ってくる";
+  document.getElementById("btn-aimiss").style.display=weakT.length?"block":"none";
+  // 入口ボタンとリード文
+  renderNext();
   // 暗唱セット
   const kd=anshoDone(),kt=keySents().length;
   document.getElementById("keystat").textContent="覚えた "+kd+"/"+kt;
   document.getElementById("keydesc").textContent=kd===kt
-    ? "13の型ぜんぶ、代表文が口から出る状態。あとは差し替えて使うだけ。"
+    ? "20の型ぜんぶ、代表文が口から出る状態。あとは差し替えて使うだけ。"
     : "型ごとに1本だけ。これを覚えると、あとは中身を入れ替えれば言える。3回続けて言えたら覚えた扱い。";
   // いま出せる文の数をボタンに出す（解放が進むと増える）
   const total=sentsOf(null).length;
-  document.getElementById("btn-all-learn").textContent="📖 覚える（"+total+"文）";
-  document.getElementById("btn-all-quiz").textContent="✏️ 試す（"+total+"問）";
+  document.getElementById("btn-all-learn").textContent="📖 全部まとめて覚える（"+total+"文）";
+  document.getElementById("btn-all-quiz").textContent="✏️ 全部まとめて試す（"+total+"問）";
+  const doneAll=SSENTS.filter(avail).filter(s=>said[s.id]===1).length;
+  document.getElementById("stagesum").textContent="言えた "+doneAll+"/"+total;
+}
+
+// ===== 次にやること =====
+// 未完のステージのうち、いちばん上のものを返す。全部済んでいれば null。
+function nextStage(){
+  for(const stg of SSTAGES){
+    const ss=sentsOf("s:"+stg.id);
+    if(ss.some(s=>said[s.id]!==1))return stg;
+  }
+  return null;
+}
+function renderNext(){
+  const btn=document.getElementById("btn-next"),lead=document.getElementById("homelead");
+  const kd=anshoDone(),kt=keySents().length;
+  // 入口が暗唱のときは、下の暗唱カードを隠す（同じものが2つ並ぶのを避ける）
+  document.getElementById("deck-key").style.display=(kd<kt)?"none":"flex";
+  if(kd<kt){
+    btn.textContent="▶ 暗唱セットから始める（"+kd+"/"+kt+"）";
+    lead.textContent="型を見分けるより先に、代表文が口から出る状態を作る。ここが入口。20文だけ。";
+    btn.dataset.go="key";return;
+  }
+  const stg=nextStage();
+  if(stg){
+    const i=SSTAGES.indexOf(stg)+1;
+    const ss=sentsOf("s:"+stg.id),done=ss.filter(s=>said[s.id]===1).length;
+    btn.textContent="▶ ステージ"+i+" を続ける（"+done+"/"+ss.length+"）";
+    lead.textContent=stg.name+" — "+stg.lead;
+    btn.dataset.go="s:"+stg.id;return;
+  }
+  const nd=SSENTS.filter(s=>need[s.id]>0).length;
+  if(nd){
+    btn.textContent="▶ 定着待ちの"+nd+"文をやる";
+    lead.textContent="ひととおり言えた。あとは3回続けて正解する文を消していくだけ。";
+    btn.dataset.go="need";return;
+  }
+  btn.textContent="✏️ 全部を試す（"+sentsOf(null).length+"問）";
+  lead.textContent="6ステージぜんぶ言えた状態。四択で抜けを探す。";
+  btn.dataset.go="quizall";
+}
+function startNext(){
+  const go=document.getElementById("btn-next").dataset.go;
+  if(go==="key")startLearn("key");
+  else if(go==="need")startQuiz("need");
+  else if(go==="quizall")startQuiz(null);
+  else startLearn(go);
 }
 function renderChart(){
   document.getElementById("chartbody").innerHTML=SSTAGES.map((stg,i)=>{
@@ -419,6 +487,7 @@ function resetAll(){
     said={};need={};missT={};ansho={};save();goHome();
   }
 }
+window.__resetAll=resetAll;   // ☰ メニューから呼ぶ
 </script>
 <script>
 // ===== 覚えるモード: 日本語を見て英語で言う → 答え合わせ → 言えた/言えなかった =====

@@ -51,11 +51,8 @@ section .term b{color:var(--gold)}
 <script src="jumon.js"></script>
 </head>
 <body>
-<header>
-  <div class="htitle">📖 用語なし解説</div>
-  <nav class="hnav"><a href="index.html">▶ ドリル</a><a href="kanryo.html">⏳ 完了形</a><a href="saigakushu.html">🧱 再学習</a><a href="tango.html">🎴 単語帳</a><a href="#" onclick="Jumon.open();return false">📜 じゅもん</a></nav>
-  <div class="appverline">版 <span class="appver">読み込み中</span></div>
-</header>
+<header id="apphdr" data-title="📖 用語なし解説"></header>
+<script src="menu.js"></script>
 <h1>英文法を用語なしで説明する</h1>
 <p class="lead">教科書の用語（不定詞・分詞構文…）は使わずに説明する。用語は各見出しの下と最後の翻訳表に「教科書ではこう呼ぶ」として添えてある。AIや教科書に質問する時だけ使えばいい。</p>
 <div id="toc" class="toc"></div>
