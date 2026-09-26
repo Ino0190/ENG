@@ -129,6 +129,7 @@ p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
 <body>
 <header id="apphdr" data-title="⏳ 現在完了"></header>
 <script src="menu.js"></script>
+<script src="fx.js"></script>
 
 <div class="screen on" id="scr-home">
   <h1>型で見分けて、文で覚える</h1>
@@ -341,6 +342,8 @@ function reveal(){
 }
 function judge(ok){
   if(!revealed)return;
+  // 自己申告なので「言えなかった」は演出を出さず、連続だけ切る
+  if(window.FX)FX.hit(ok,document.querySelector("#ljudge ."+(ok?"said":"nosaid")),{quiet:!ok});
   if(ok){said[cur.id]=1;okCount++;queue.shift();}
   else{
     said[cur.id]=0;
@@ -396,6 +399,7 @@ function answer(el){
     queue.shift();queue.splice(Math.min(3,queue.length),0,cur.id);
   }
   save();
+  if(window.FX)FX.hit(ok,el,{master:loop.indexOf("定着した")>=0});
   const t=typeById[cur.t];
   document.getElementById("qexp").innerHTML='<div class="verdict '+(ok?"ok":"ng")+'">'+(ok?"⭕ 正解":"❌ 不正解")+'</div>'
     +'<div class="full">'+markEn(cur)+'</div>'

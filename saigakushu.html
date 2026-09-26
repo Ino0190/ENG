@@ -154,6 +154,7 @@ details.jinv summary{cursor:pointer;font-size:14px;color:var(--blue);font-weight
 <body>
 <header id="apphdr" data-title="🧱 再学習"></header>
 <script src="menu.js"></script>
+<script src="fx.js"></script>
 
 <div class="screen on" id="scr-home">
   <h1>現在完了の次から高校まで</h1>
@@ -532,7 +533,11 @@ function reveal(){
 function judge(ok){
   if(!revealed)return;
   // 暗唱モードは3回続けて言えたら覚えた扱い。間違えても型の苦手判定には入れない
+  const jbtn=document.querySelector("#ljudge ."+(ok?"said":"nosaid"));
   if(lastMode&&lastMode.t==="key"){
+    // 3回続けて言えた瞬間＝暗唱の定着。いちばん大きい演出にする
+    const willMaster=ok&&(ansho[cur.id]||0)+1>=3;
+    if(window.FX)FX.hit(ok,jbtn,{quiet:!ok,master:willMaster});
     if(ok){
       ansho[cur.id]=(ansho[cur.id]||0)+1;
       if(ansho[cur.id]>=3){said[cur.id]=1;okCount++;queue.shift();}
@@ -543,6 +548,8 @@ function judge(ok){
     }
     save();showL();return;
   }
+  // 自己申告なので「言えなかった」は演出を出さず、連続だけ切る
+  if(window.FX)FX.hit(ok,jbtn,{quiet:!ok});
   if(ok){said[cur.id]=1;okCount++;queue.shift();}
   else{
     said[cur.id]=0;
@@ -606,6 +613,7 @@ function answer(el){
     save();
   }
   save();
+  if(window.FX)FX.hit(ok,el,{master:loop.indexOf("定着した")>=0});
   const t=typeById[cur.t];
   document.getElementById("qexp").innerHTML='<div class="verdict '+(ok?"ok":"ng")+'">'+(ok?"⭕ 正解":"❌ 不正解")+'</div>'
     +'<div class="full">'+markEn(cur)+'</div>'

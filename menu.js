@@ -113,6 +113,13 @@ header#apphdr{position:sticky;top:0;z-index:20;background:rgba(15,20,32,.96);bac
       b.onclick = function () { window.Menu.close(); window.Speak.openPanel(); };
       rows.appendChild(b);
     }
+    if (window.FX) {
+      const b = el("button", "mi");
+      const label = () => { b.textContent = "✨ 正解のエフェクト: " + (window.FX.enabled() ? "オン" : "オフ"); };
+      label();
+      b.onclick = function () { window.FX.setEnabled(!window.FX.enabled()); label(); };
+      rows.appendChild(b);
+    }
     if (window.Jumon) {
       const b = el("button", "mi", "📜 ふっかつのじゅもん（進捗を持ち運ぶ）");
       b.onclick = function () { window.Menu.close(); window.Jumon.open(); };

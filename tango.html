@@ -91,6 +91,7 @@ p.lead{color:var(--sub);font-size:16px;margin-bottom:20px}
 <body>
 <header id="apphdr" data-title="🎴 英単語 どっち"></header>
 <script src="menu.js"></script>
+<script src="fx.js"></script>
 
 <div class="screen on" id="scr-home">
   <h1>繰り返しで覚える</h1>
@@ -353,6 +354,7 @@ function answer(el){
     queue.shift();queue.splice(Math.min(3,queue.length),0,w.w);
   }
   saveNeed();
+  if(window.FX)FX.hit(ok,el,{master:loopMsg.indexOf("定着した")>=0});
   const ex=hiEx(w);
   const exp=document.getElementById("qexp");
   exp.innerHTML='<div class="verdict '+(ok?"ok":"ng")+'">'+(ok?"⭕ 正解":"❌ 不正解")+'　<span style="font-size:15px;color:var(--text)">'+w.w+" = "+w.jp+'</span></div>'

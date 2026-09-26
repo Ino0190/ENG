@@ -136,6 +136,7 @@ header{position:sticky;top:0;z-index:10;background:rgba(15,20,32,.95);backdrop-f
 <header id="apphdr" data-title="英文法診断ドリル" data-bar="1"></header>
 <!-- menu.js は header のあとに読む。ページ側のスクリプトが #hstat を触るので、先に作らせる -->
 <script src="menu.js"></script>
+<script src="fx.js"></script>
 
 <div class="screen home on" id="scr-home">
   <h1>どこから崩れてる？</h1>
@@ -355,6 +356,7 @@ function answer(i){
     if(idx===q.a)el.classList.add("correct");
     else if(idx===i)el.classList.add("wrong");
   });
+  if(window.FX)FX.hit(ok,document.querySelector('.opt[data-i="'+i+'"]'));
   const full=q.en.replace("___",q.o[q.a]);
   const exp=document.getElementById("qexp");
   exp.innerHTML='<div class="verdict '+(ok?"ok":"ng")+'">'+(ok?"⭕ 正解":"❌ 不正解")+'</div>'
